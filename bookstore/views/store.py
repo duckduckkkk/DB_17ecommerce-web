@@ -5,7 +5,7 @@ from flask import url_for, redirect, flash
 from flask import render_template
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from datetime import datetime
-from numpy import identity, product
+from numpy import identity, prod
 import random, string
 from sqlalchemy import null
 from link import *

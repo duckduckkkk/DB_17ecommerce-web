@@ -3,7 +3,7 @@ from typing_extensions import Self
 from flask import Flask, request, template_rendered, Blueprint, url_for, redirect, flash, render_template
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from datetime import datetime
-from numpy import identity, product
+from numpy import identity, prod
 from sqlalchemy import null
 from api.api import *
 from api.sql import *
