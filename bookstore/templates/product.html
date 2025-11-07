@@ -14,12 +14,12 @@
 <div class="card" style="width: 20rem;margin-left:5%">
   <img src={{ url_for('static', filename = temp  ) }} class="card-img-top">
   <div class="card-body">
-    <h5 class="card-title">{{ data.商品名稱 }}</h5>
+    <h5 class="card-title">{{ data.Name }}</h5> 
     <p class="card-text"></p>
   </div>
   <ul class="list-group list-group-flush">
-    <li class="list-group-item"><b>商品類別</b>&nbsp;&nbsp;{{ data.類別 }}</li>
-    <li class="list-group-item"><b>商品單價</b>&nbsp;&nbsp;{{ data.單價 }}</li>
+    <li class="list-group-item"><b>商品類別</b>&nbsp;&nbsp;{{ data.Pstatus }}</li> 
+    <li class="list-group-item"><b>商品單價</b>&nbsp;&nbsp;{{ data.Stock_price }}</li> 
   </ul>
   <div class="card-body">
     <a href="{{ url_for('bookstore.bookstore') }}" class="btn btn-outline-primary">回商品列表</a>
@@ -33,9 +33,9 @@
   <h5 class="card-header">商品介紹</h5>
   <div class="card-body">
     <p class="card-text">
-      {{data.商品敘述}}
+      {{ data.Description }}
     </p>
-    <button class="btn btn-outline-success" type="submit" value="{{data.商品編號}}" name="pid">加入購物車</a>
+    <button class="btn btn-outline-success" type="submit" value="{{data.Product_id}}" name="pid">加入購物車</button>
   </div>
 </div>
 </form>

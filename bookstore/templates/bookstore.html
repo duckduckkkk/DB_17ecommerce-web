@@ -35,7 +35,7 @@
   <form method="post" action={{ url_for('bookstore.cart') }}>
       
       
-      {% for book in book_data %}
+      {% for product in product_data %}
       {% if loop.index % 3 == 1 %}
       <div class="row">
       {% endif %}
@@ -43,11 +43,11 @@
         <div class="col-sm-4">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">{{book.商品名稱}}</h5>
-              <p class="card-text">${{book.商品價格}}</p>
+              <h5 class="card-title">{{product.Name}}</h5>  
+              <p class="card-text">${{product.Stock_price}}</p> 
               
-              <a href="{{ url_for('bookstore.bookstore', pid=book.商品編號) }}" class="btn btn-outline-primary">查看商品資訊</a>
-              <button class="btn btn-outline-success" type="submit" value="{{book.商品編號}}" name="pid" >加入購物車</button>
+              <a href="{{ url_for('bookstore.bookstore', pid=product.Product_id, sid=product.Supplier_id) }}" class="btn btn-outline-primary">查看商品資訊</a>
+              <button class="btn btn-outline-success" type="submit" value="{{ product.Product_id }}" name="pid">加入購物車</button> 
             </div>
           </div>
         </div>
