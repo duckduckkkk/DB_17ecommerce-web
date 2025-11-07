@@ -234,20 +234,23 @@ class Order_List:
     @staticmethod
     def get_order():
         sql = '''
-            SELECT o.oid, m.name, o.price, o.ordertime
-            FROM order_list o
-            NATURAL JOIN member m
-            ORDER BY o.ordertime DESC
+            SELECT O."Order_id" AS 訂單編號,
+                   U."Name" AS 訂購人,
+                   O."Total_amount" AS 訂單總價,
+                   O."Order_date" AS 訂單時間,
+                   CASE WHEN O."Green_delivery" ILIKE 'Y' THEN 'Y' ELSE 'N' END AS 綠色運送
+            FROM "Order" O
+            JOIN "User" U ON O."User_id"= U."User_id"
+            ORDER BY O."Order_date" DESC
         '''
         return DB.fetchall(sql)
 
     @staticmethod
     def get_orderdetail():
         sql = '''
-        SELECT o.oid, p.pname, r.saleprice, r.amount
-        FROM order_list o
-        JOIN record r ON o.tno = r.tno -- 確保兩者都是 bigint 類型
-        JOIN product p ON r.pid = p.pid
+        SELECT O."Order_id", P."Name", P."Stock_price" , O."Quantity" 
+        FROM "Order_Item" O
+        JOIN "Product" P ON O."Product_id" = P."Product_id"
         '''
         return DB.fetchall(sql)
 
