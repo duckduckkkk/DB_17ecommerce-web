@@ -9,16 +9,15 @@
 <br/>
 
 {% with messages = get_flashed_messages() %}
-{% if messages %}
-  
-<script language="javascript">
-
-  alert('您沒有管理員的權限喔！');
-
-</script>
-
-{% endif %}
+  {% for message in messages %}
+    {% if message == 'No permission' %}
+      <script language="javascript">
+        alert('您沒有管理員的權限喔！');
+      </script>
+    {% endif %}
+  {% endfor %}
 {% endwith %}
+
 
 <div class="book_table container-xxl">
 
