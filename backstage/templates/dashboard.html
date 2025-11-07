@@ -10,9 +10,9 @@
   <div id="dashboard">
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">訂單數量分析</button>
-        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">書本銷量分類</button>
-        <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">消費總額排名</button>        
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">年/月銷售額分析</button>
+        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">供應商銷售分析</button>
+        <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">客戶消費排名</button>        
       </div>      
     </nav>
   </div>
@@ -44,7 +44,7 @@
   var count = {{dataa|tojson}};
   var optiona = {
     title: {
-      text: '各月訂單數量分析'
+      text: '各月總銷售額'
     },
     tooltip: {},
     legend: {
@@ -55,15 +55,15 @@
     },
     yAxis: {},
     series: [{
-      name: '銷售總額',
+      name: '總銷售額/NTD',
       type: 'bar',
       // symbol: 'circle',
       symbolSize: 16,
       data: data,
       markPoint: {
         data: [
-          {type: 'max', name: '銷量最高月份'},
-          {type: 'min', name: '銷量最低月份'}
+          {type: 'max', name: '銷量額最高月份'},
+          {type: 'min', name: '銷量額最低月份'}
         ]
       },
       label: {
@@ -80,105 +80,124 @@
     },
   };
 
-  // 以圓餅圖分析書本銷量
-  var chartDomb = document.getElementById('mainb');
-  var myChartb = echarts.init(chartDomb);
-  var data = {{datab|tojson}};
-  var optionb = {
+  var datab = {{ datab|tojson | safe if datab else '[]' }};
+
+// 分離有銷售額和銷售額為0的供應商
+var pieData = datab.filter(item => item.value > 0);
+var zeroData = datab.filter(item => item.value === 0);
+
+// 自動給 0 值供應商分配顏色（可以用任何你喜歡的顏色列表）
+var zeroColorList = ['#FF7F50','#87CEFA','#DA70D6','#32CD32','#6495ED','#FF69B4','#BA55D3','#CD5C5C'];
+zeroData = zeroData.map((item, index) => ({
+    name: item.name,
+    value: item.value,
+    itemStyle: { color: zeroColorList[index % zeroColorList.length] }
+}));
+
+var chartDomb = document.getElementById('mainb');
+var myChartb = echarts.init(chartDomb);
+
+var optionb = {
+    color: ['#5470C6', '#91CC75', '#EE6666', '#FAC858', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'], // 主圓餅顏色
     title: {
-      text: '各類商品銷量分析',
-      left: 'center',
-      top: 'center'
+        text: '各供應商總銷貨額',
+        left: 'center',
+        top: '5%'
     },
-    tooltip: {},
+    tooltip: {
+        trigger: 'item',
+        formatter: '{b} : {c} ({d}%)'
+    },
     legend: {
-      orient: 'vertical',
-      x: 'left',
-      data: ['BOOK', 'CD', 'DVD']
+        orient: 'vertical',
+        left: 'left',
+        data: datab.map(item => item.name) // 顯示所有供應商
     },
     series: [
-      {
-        type: 'pie',
-        data: data,          
-        radius: ['40%', '70%']
-      }
+        {
+            name: '銷量',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            center: ['50%', '55%'],
+            data: pieData,
+            label: {
+                show: true,
+                formatter: '{b}: {c} ({d}%)'
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 15,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        },
+        {
+            name: '銷售額為0的供應商',
+            type: 'pie',
+            radius: ['12%', '18%'],  // 外圈圓餅
+            center: ['50%', '55%'],
+            data: zeroData, // 自動分配顏色的 0 值供應商
+            label: {
+                show: true,
+                position: 'outside',
+                formatter: '{b}: {c}',
+                color: '#555555'
+            },
+            labelLine: {
+                show: true
+            }
+        }
     ]
-  };
+};
+
+myChartb.setOption(optionb);
+
+
 
   // 使用動態長條圖查看消費總額最多的使用者
   var chartDomc = document.getElementById('mainc');
   var myChartc = echarts.init(chartDomc);
-  var data = {{datac|tojson}};
-  var nameList = {{nameList|tojson}};
-  // var counter = {{counter|tojson}};
-  var countList = {{countList|tojson}};
+
+  var data = {{datac|tojson}};      // 消費總額
+  var nameList = {{nameList|tojson}}; // 使用者名稱
+
   var optionc = {
-    title: {
-      text: '使用者消費排名'
-    },
-    xAxis: {
-      max: 'dataMax'
-    },
-    yAxis: {
-      type: 'category',
-      data: nameList,
-      inverse: true,
-      animationDuration: 300,
-      animationDurationUpdate: 300,
-      max: 3
-    },
-    tooltip: {},
-    series: [
-      {
-        realtimeSort: true,
-        name: '消費總額',
-        type: 'bar',
-        data: data,
-        label: {
-          show: true,
-          position: 'right',
-          valueAnimation: true
-        }
+      title: {
+          text: '單一顧客消費總額',
+          left: 'center'
       },
-      {
-        realtimeSort: true,
-        name: '訂單總數',
-        type: 'bar',
-        data: countList,
-        label: {
-          show: true,
-          position: 'right',
-          valueAnimation: true
-        }
-      }
-      ],
-    legend: {
-      show: true
-    },
-    animationDuration: 3000,
-    animationDurationUpdate: 3000,
-    animationEasing: 'linear',
-    animationEasingUpdate: 'linear'
+      tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' }
+      },
+      xAxis: {
+          type: 'value',
+          name: '消費總額'
+      },
+      yAxis: {
+          type: 'category',
+          data: nameList,
+          inverse: true
+      },
+      series: [{
+          name: '消費總額/NTD',
+          type: 'bar',
+          data: data,
+          barWidth: 30,
+          label: {
+              show: true,
+              position: 'right'
+          },
+          itemStyle: {
+              color: '#06d2daff'
+          }
+      }]
   };
 
-  function run() {
-    myChartc.setOption({
-      series: [
-        {
-          type: 'bar',
-          data
-        }
-      ]
-    });
-  }
+  myChartc.setOption(optionc);
 
-  setTimeout(function() {
-    run();
-  }, 0);
-        
-  setInterval(function() {
-    update();
-  }, 3000);
+
 
   optiona && myCharta.setOption(optiona);
   optionb && myChartb.setOption(optionb);
