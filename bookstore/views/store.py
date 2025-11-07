@@ -66,20 +66,20 @@ def bookstore():
         return render_template('bookstore.html', single=single, keyword=search, product_data=book_data, user=current_user.name, page=1, flag=flag, count=count) 
 
     
-    elif 'pid' in request.args and 'sid' in request.args:  # MODIFIED: 加 supplier_id
+    elif 'pid' in request.args and 'sid' in request.args: 
         pid = request.args['pid']
-        sid = request.args['sid']  # MODIFIED
+        sid = request.args['sid']  
         data = Product.get_product(pid, sid)
         
-        pname = data[3]         # MODIFIED
-        price = data[2]         # MODIFIED
-        category = data[4]      # MODIFIED: Pstatus or category?
-        description = data[5]   # MODIFIED
+        pname = data[3]      
+        price = data[2]      
+        category = data[4]     
+        description = data[5] 
         image = 'sdg.jpg'
         
         product = {
             'Product_id': pid,
-            'Supplier_id': sid,    # MODIFIED
+            'Supplier_id': sid,   
             'Name': pname,
             'Stock_price': price,
             'Pstatus': category,
@@ -94,7 +94,7 @@ def bookstore():
         start = (page - 1) * 9
         end = page * 9
         
-        book_row = Product.get_all_product()  # MODIFIED
+        book_row = Product.get_all_product() 
         book_data = []
         final_data = []
         
@@ -116,14 +116,13 @@ def bookstore():
         for j in range(start, end):
             final_data.append(book_data[j])
         
-        return render_template('bookstore.html', product_data=final_data, user=current_user.name, page=page, flag=flag, count=count)  # MODIFIED  
+        return render_template('bookstore.html', product_data=final_data, user=current_user.name, page=page, flag=flag, count=count) 
     
     elif 'keyword' in request.args:
         single = 1
         search = request.values.get('keyword')
         keyword = search
-        cursor.execute('SELECT * FROM "Product" WHERE "Name" LIKE %s', ('%' + search + '%',))  # MODIFIED
-        book_row = cursor.fetchall()
+        cursor.execute('SELECT * FROM "Product" WHERE "Name" LIKE %s', ('%' + search + '%',)) 
         book_data = []
         total = 0
         
