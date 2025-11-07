@@ -36,16 +36,20 @@ def bookstore():
         search = request.values.get('keyword')
         keyword = search
         
-        cursor.execute('SELECT * FROM PRODUCT WHERE PNAME LIKE %s', ('%' + search + '%',))
+        cursor.execute('SELECT * FROM "Product" WHERE "Name" LIKE %s', ('%' + search + '%',))  
         book_row = cursor.fetchall()
         book_data = []
         final_data = []
         
         for i in book_row:
             book = {
-                '商品編號': i[0],
-                '商品名稱': i[1],
-                '商品價格': i[2]
+                'Product_id': i[0],
+                'Name': i[3],
+                'Stock_price': i[2],
+                'Supplier_id': i[1],
+                'Pstatus': i[4],
+                'Description': i[5]
+
             }
             book_data.append(book)
             total = total + 1
@@ -59,25 +63,27 @@ def bookstore():
             
         count = math.ceil(total/9)
         
-        return render_template('bookstore.html', single=single, keyword=search, book_data=book_data, user=current_user.name, page=1, flag=flag, count=count)    
+        return render_template('bookstore.html', single=single, keyword=search, product_data=book_data, user=current_user.name, page=1, flag=flag, count=count) 
 
     
-    elif 'pid' in request.args:
+    elif 'pid' in request.args and 'sid' in request.args:  # MODIFIED: 加 supplier_id
         pid = request.args['pid']
-        data = Product.get_product(pid)
+        sid = request.args['sid']  # MODIFIED
+        data = Product.get_product(pid, sid)
         
-        pname = data[1]
-        price = data[2]
-        category = data[3]
-        description = data[4]
+        pname = data[3]         # MODIFIED
+        price = data[2]         # MODIFIED
+        category = data[4]      # MODIFIED: Pstatus or category?
+        description = data[5]   # MODIFIED
         image = 'sdg.jpg'
         
         product = {
-            '商品編號': pid,
-            '商品名稱': pname,
-            '單價': price,
-            '類別': category,
-            '商品敘述': description,
+            'Product_id': pid,
+            'Supplier_id': sid,    # MODIFIED
+            'Name': pname,
+            'Stock_price': price,
+            'Pstatus': category,
+            'Description': description,
             '商品圖片': image
         }
 
@@ -88,15 +94,18 @@ def bookstore():
         start = (page - 1) * 9
         end = page * 9
         
-        book_row = Product.get_all_product()
+        book_row = Product.get_all_product()  # MODIFIED
         book_data = []
         final_data = []
         
         for i in book_row:
             book = {
-                '商品編號': i[0],
-                '商品名稱': i[1],
-                '商品價格': i[2]
+                'Product_id': i[0],
+                'Name': i[3],
+                'Stock_price': i[2],
+                'Supplier_id': i[1],
+                'Pstatus': i[4],
+                'Description': i[5]
             }
             book_data.append(book)
             
@@ -107,22 +116,25 @@ def bookstore():
         for j in range(start, end):
             final_data.append(book_data[j])
         
-        return render_template('bookstore.html', book_data=final_data, user=current_user.name, page=page, flag=flag, count=count)    
+        return render_template('bookstore.html', product_data=final_data, user=current_user.name, page=page, flag=flag, count=count)  # MODIFIED  
     
     elif 'keyword' in request.args:
         single = 1
         search = request.values.get('keyword')
         keyword = search
-        cursor.execute('SELECT * FROM PRODUCT WHERE PNAME LIKE %s', ('%' + search + '%',))
+        cursor.execute('SELECT * FROM "Product" WHERE "Name" LIKE %s', ('%' + search + '%',))  # MODIFIED
         book_row = cursor.fetchall()
         book_data = []
         total = 0
         
         for i in book_row:
             book = {
-                '商品編號': i[0],
-                '商品名稱': i[1],
-                '商品價格': i[2]
+                'Product_id': i[0],
+                'Name': i[3],
+                'Stock_price': i[2],
+                'Supplier_id': i[1],
+                'Pstatus': i[4],
+                'Description': i[5]
             }
 
             book_data.append(book)
@@ -133,7 +145,7 @@ def bookstore():
         
         count = math.ceil(total/9)    
         
-        return render_template('bookstore.html', keyword=search, single=single, book_data=book_data, user=current_user.name, page=1, flag=flag, count=count)    
+        return render_template('bookstore.html', keyword=search, single=single, product_data=book_data, user=current_user.name, page=1, flag=flag, count=count)  # MODIFIED   
     
     else:
         book_row = Product.get_all_product()
@@ -141,14 +153,17 @@ def bookstore():
         temp = 0
         for i in book_row:
             book = {
-                '商品編號': i[0],
-                '商品名稱': i[1],
-                '商品價格': i[2],
+                'Product_id': i[0],
+                'Name': i[3],
+                'Stock_price': i[2],
+                'Supplier_id': i[1],
+                'Pstatus': i[4],
+                'Description': i[5]
             }
             if len(book_data) < 9:
                 book_data.append(book)
         
-        return render_template('bookstore.html', book_data=book_data, user=current_user.name, page=1, flag=flag, count=count)
+        return render_template('bookstore.html', product_data=book_data, user=current_user.name, page=1, flag=flag, count=count)  # MODIFIED
 
 # 會員購物車
 @store.route('/cart', methods=['GET', 'POST'])
