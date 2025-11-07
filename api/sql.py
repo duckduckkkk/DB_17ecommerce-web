@@ -278,25 +278,50 @@ class Order_List:
 class Analysis:
     @staticmethod
     def month_price(i):
-        sql = 'SELECT EXTRACT(MONTH FROM ordertime), SUM(price) FROM order_list WHERE EXTRACT(MONTH FROM ordertime) = %s GROUP BY EXTRACT(MONTH FROM ordertime)'
+        sql = 'SELECT EXTRACT(MONTH FROM "Order_date"), SUM("Total_amount") FROM "Order" WHERE EXTRACT(MONTH FROM "Order_date") = %s GROUP BY EXTRACT(MONTH FROM "Order_date")'
         return DB.fetchall(sql, (i,))
 
     @staticmethod
     def month_count(i):
-        sql = 'SELECT EXTRACT(MONTH FROM ordertime), COUNT(oid) FROM order_list WHERE EXTRACT(MONTH FROM ordertime) = %s GROUP BY EXTRACT(MONTH FROM ordertime)'
+        sql = 'SELECT EXTRACT(MONTH FROM "Order_date"), COUNT("Order_id") FROM "Order" WHERE EXTRACT(MONTH FROM "Order_date") = %s GROUP BY EXTRACT(MONTH FROM "Order_date")'
         return DB.fetchall(sql, (i,))
 
     @staticmethod
+    # api/sql.py
     def category_sale():
-        sql = 'SELECT SUM(total), category FROM product, record WHERE product.pid = record.pid GROUP BY category'
+        sql = '''
+            SELECT 
+                s."Sname" AS name,
+                COALESCE(SUM(oi."Quantity" * p."Stock_price"), 0) AS value
+            FROM "Supplier" s
+            LEFT JOIN "Product" p ON p."Supplier_id" = s."Supplier_id"
+            LEFT JOIN "Order_Item" oi ON oi."Product_id" = p."Product_id"
+            GROUP BY s."Sname"
+            ORDER BY value DESC;
+        '''
         return DB.fetchall(sql)
+
 
     @staticmethod
     def member_sale():
-        sql = 'SELECT SUM(price), member.mid, member.name FROM order_list, member WHERE order_list.mid = member.mid AND member.identity = %s GROUP BY member.mid, member.name ORDER BY SUM(price) DESC'
+        sql = '''
+            SELECT SUM(O."Total_amount") AS total_amount, U."Name"
+            FROM "Order" O
+            JOIN "User" U ON O."User_id" = U."User_id"
+            WHERE U."Identity" = '使用者'
+            GROUP BY U."User_id", U."Name"
+            ORDER BY total_amount DESC
+        '''
         return DB.fetchall(sql, ('user',))
 
     @staticmethod
     def member_sale_count():
-        sql = 'SELECT COUNT(*), member.mid, member.name FROM order_list, member WHERE order_list.mid = member.mid AND member.identity = %s GROUP BY member.mid, member.name ORDER BY COUNT(*) DESC'
+        sql = '''
+            SELECT COUNT(*) AS order_count, U."User_id", U."Name"
+            FROM "Order" O
+            JOIN "User" U ON O."User_id" = U."User_id"
+            WHERE U."Identity" = '使用者'
+            GROUP BY U."User_id", U."Name"
+            ORDER BY order_count DESC
+        '''
         return DB.fetchall(sql, ('user',))
