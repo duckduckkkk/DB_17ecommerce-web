@@ -29,19 +29,19 @@
       <tr>
         <th>類別</th>
         <td>
-          <select class="form-control" name="category">
-            {% if data.類別 == 'CD' %}
-              <option value="BOOK">BOOK</option>
-              <option value="DVD">DVD</option>
-              <option value="CD" selected>CD</option>
-            {% elif data.類別 == 'DVD' %}
-              <option value="BOOK">BOOK</option>
-              <option value="DVD" selected>DVD</option>
-              <option value="CD">CD</option>
+          <select class="form-control" name="Category">
+            {% if data.類別 == '上身' %}
+              <option value="其他">其他</option>
+              <option value="下身">下身</option>
+              <option value="上身" selected>上身</option>
+            {% elif data.類別 == '下身' %}
+              <option value="其他">其他</option>
+              <option value="下身" selected>下身</option>
+              <option value="上身">上身</option>
             {% else %}
-              <option value="BOOK" selected>BOOK</option>
-              <option value="DVD">DVD</option>
-              <option value="CD">CD</option>
+              <option value="其他" selected>其他</option>
+              <option value="下身">下身</option>
+              <option value="上身">上身</option>
             {% endif %}
             
         </select>
@@ -51,6 +51,23 @@
         <td>
           <textarea class="form-control" name="description">{{ data.商品敘述 }}</textarea>
         </td>
+      </tr>
+      <tr>
+        <th>商品狀態</th>
+        <td>
+          <select class="form-control" name="Pstatus">
+            {% if data.商品狀態 == '全新' %}
+              <option value="全新" selected>全新</option>
+              <option value="二手">二手</option>
+            {% else %}
+              <option value="全新">全新</option>
+              <option value="二手" selected>二手</option>
+            {% endif %}    
+        </select>
+      </tr>
+      <tr>
+        <th>供應商</th>
+        <td><input class="form-control" type="text" value="{{ data.供應商 }}" name="Supplier_id" required></td>
       </tr>
       <!-- <tr>
         <th>商品圖片</th>

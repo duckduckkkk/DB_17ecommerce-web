@@ -69,24 +69,36 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="inputProductName" class="form-label">商品名稱</label>
-                        <input type="text" class="form-control" id="inputProductName" name="pname" required>
+                        <input type="text" class="form-control" id="inputProductName" name="Name" required>
                     </div>
                     <div class="mb-3">
                         <label for="inputUnitPrice" class="form-label">商品單價</label>
-                        <input type="number" class="form-control" id="inputUnitPrice" name="price" required>
+                        <input type="number" class="form-control" id="inputUnitPrice" name="Stock_price" required>
                     </div>
                     <div class="mb-3">
                         <label for="inputProductCategory" class="form-label">商品種類</label>
-                        <select id="inputProductCategory" class="form-select" name="category" required>
+                        <select id="inputProductCategory" class="form-select" name="Category" required>
                             <option selected disabled value="">請選擇類型</option>
-                            <option value="BOOK">BOOK</option>
-                            <option value="CD">CD</option>
-                            <option value="DVD">DVD</option>
+                            <option value="上身">上身</option>
+                            <option value="下身">下身</option>
+                            <option value="其他">其他</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="inputProductDesc" class="form-label">商品敘述</label>
-                        <textarea class="form-control" id="inputProductDesc" name="description" required></textarea>
+                        <textarea class="form-control" id="inputProductDesc" name="Description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputProductStatus" class="form-label">商品狀態</label>
+                        <select id="inputProductStatus" class="form-select" name="Pstatus" required>
+                            <option selected disabled value="">請選擇狀態</option>
+                            <option value="全新">全新</option>
+                            <option value="二手">二手</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputSupplierId" class="form-label">供應商</label>
+                        <input type="text" class="form-control" id="inputSupplierId" name="Supplier_id" required>
                     </div>
                     <!-- <div class="mb-3">
                         <label for="inputProductImg" class="form-label">商品圖片</label><br/>
@@ -114,6 +126,8 @@
             <th width="20%"><center>商品名稱</center></th>
             <th width="15%"><center>商品單價</center></th>
             <th width="15%"><center>商品類別</center></th>
+            <th width="15%"><center>商品狀態</center></th>
+            <th width="15%"><center>供應商</center></th>
             <th colspan="2"><center>資料操作</center></th>
         </tr>
     </thead>
@@ -124,6 +138,8 @@
             <td><center>{{ i.商品名稱 }}</center></td>
             <td><center>{{ i.商品售價 }}</center></td>
             <td><center>{{ i.商品類別 }}</center></td>
+            <td><center>{{ i.商品狀態 }}</center></td>
+            <td><center>{{ i.供應商 }}</center></td>
             <td><center><button type="submit" value="{{i.商品編號}}" name="edit" class="btn btn-success">編輯商品</button></center></td>
             <td><center><button type="submit" value="{{i.商品編號}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{ i.商品名稱 }}\' 嗎？'))" class="btn btn-danger">刪除商品</button></center></td>
         </tr>
