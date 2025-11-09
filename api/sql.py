@@ -142,15 +142,16 @@ class Cart:
 
 
 class Product:
+
     @staticmethod
     def count():
         sql = 'SELECT COUNT(*) FROM "Product"'
         return DB.fetchone(sql)
 
     @staticmethod
-    def get_product(product_id, supplier_id):
-        sql = 'SELECT * FROM "Product" WHERE "Product_id" = %s AND "Supplier_id" = %s'
-        return DB.fetchone(sql, (product_id, supplier_id))
+    def get_product(product_id):
+        sql = 'SELECT * FROM "Product" WHERE "Product_id" = %s'
+        return DB.fetchone(sql, (product_id,))
 
     @staticmethod
     def get_all_product():
@@ -158,19 +159,19 @@ class Product:
         return DB.fetchall(sql)
 
     @staticmethod
-    def get_name(product_id, supplier_id):
-        sql = 'SELECT "Name" FROM "Product" WHERE "Product_id" = %s AND "Supplier_id" = %s'
-        return DB.fetchone(sql, (product_id, supplier_id))[0]
+    def get_name(product_id):
+        sql = 'SELECT "Name" FROM "Product" WHERE "Product_id" = %s'
+        result = DB.fetchone(sql, (product_id,))
+        return result[0] if result else None
 
     @staticmethod
     def add_product(input_data):
         sql = '''
-            INSERT INTO "Product" ("Product_id", "Supplier_id", "Stock_price", "Name", "Pstatus", "Description")
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO "Product" ("Product_id", "Stock_price", "Name", "Pstatus", "Description")
+            VALUES (%s, %s, %s, %s, %s)
         '''
         DB.execute_input(sql, (
             input_data['Product_id'],
-            input_data['Supplier_id'],
             input_data['Stock_price'],
             input_data['Name'],
             input_data['Pstatus'],
@@ -178,24 +179,24 @@ class Product:
         ))
 
     @staticmethod
-    def delete_product(product_id, supplier_id):
-        sql = 'DELETE FROM "Product" WHERE "Product_id" = %s AND "Supplier_id" = %s'
-        DB.execute_input(sql, (product_id, supplier_id))
+    def delete_product(product_id):
+        sql = 'DELETE FROM "Product" WHERE "Product_id" = %s'
+        DB.execute_input(sql, (product_id,))
+
 
     @staticmethod
     def update_product(input_data):
         sql = '''
             UPDATE "Product"
             SET "Stock_price" = %s, "Name" = %s, "Pstatus" = %s, "Description" = %s
-            WHERE "Product_id" = %s AND "Supplier_id" = %s
+            WHERE "Product_id" = %s
         '''
         DB.execute_input(sql, (
             input_data['Stock_price'],
             input_data['Name'],
             input_data['Pstatus'],
             input_data['Description'],
-            input_data['Product_id'],
-            input_data['Supplier_id']
+            input_data['Product_id']
         ))
 
 class Record:

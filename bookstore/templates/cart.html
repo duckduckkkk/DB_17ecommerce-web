@@ -29,11 +29,11 @@
         <th><center>數量</center></th>
         <th><center>商品操作</center></th>
       </tr>
-      {% for book in data %}
+      {% for product in data %}
       <tr>
-        <td> <center>{{ book.商品編號 }}</center></td>
-        <td> <center>{{ book.商品名稱 }}</center></td>
-        <td> <center>{{ book.商品價格 }}</center></td>
+        <td> <center>{{ book.Product_id }}</center></td>
+        <td> <center>{{ book.Name }}</center></td>
+        <td> <center>{{ book.Stock_price}}</center></td>
         <td width="20%">
           <center>
             <input class="form-control" type="number" onkeyup="value=value.replace(/[^\d]/g,'')" min="1" value="{{ book.數量 }}" name="{{ book.商品編號 }}">
