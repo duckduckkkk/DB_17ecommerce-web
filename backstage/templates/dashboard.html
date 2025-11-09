@@ -4,7 +4,33 @@
 {% endblock head %}
 {% block title %}後台資料分析{% endblock title%}
 {% block content %}
+<style>
+#dashboard .nav-link {
+    color: white; /* 文字白色 */
+    background-color: rgba(16, 42, 77, 0.8); 
+    border: none;
+    margin-right: 5px;
+    border-radius: 8px;
+    transition: all 0.3s ease; 
+}
 
+#dashboard .nav-link:hover {
+    background-color: rgba(25, 167, 100, 0.8); 
+    transform: scale(1.05); /* 放大 5% */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
+}
+
+#dashboard .nav-link.active {
+    background-color: rgba(8, 114, 82, 0.8); 
+    font-weight: 600; /* 加粗 */
+    transform: scale(1); 
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); 
+}
+
+#dashboard .nav-link {
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+</style>
 <div class="my-3 p-3 bg-body rounded shadow-sm">
   <!-- Dashboard -->
   <div id="dashboard">

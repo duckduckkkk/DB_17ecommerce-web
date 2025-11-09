@@ -55,6 +55,7 @@
         <th><center>訂單編號</center></th>
         <th><center>訂單總價</center></th>
         <th><center>訂單時間</center></th>
+        <th style="background-color: green;color:white; text-align: center;">綠色運送</th>
         <th><center>查看訂單</center></th>
       </tr>
       {% for i in data %}
@@ -62,6 +63,7 @@
         <td> <center>{{ i.訂單編號 }}</center></td>
         <td> <center>{{ i.訂單總價 }}</center></td>
         <td> <center>{{ i.訂單時間 }}</center></td>
+        <td> <center>{{ i.綠色運送 }}</center></td>
         <td width="20%">
           <center>
             <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.訂單編號}}">
@@ -72,9 +74,7 @@
       </tr>
       {% endfor %}
     </table>
-
   </form>
 </div>
 
 {% endblock content %}
-
