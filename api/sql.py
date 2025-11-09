@@ -88,17 +88,20 @@ class DB:
 class Member:
     @staticmethod
     def get_member(account):
-        sql = "SELECT account, password, mid, identity, name FROM member WHERE account = %s"
+        sql = 'SELECT "Account", "Password", "User_id", "Identity", "Name" FROM "User" WHERE "Account" = %s'
         return DB.fetchall(sql, (account,))
 
     @staticmethod
     def get_all_account():
-        sql = "SELECT account FROM member"
+        sql = 'SELECT "Account" FROM "User"'
         return DB.fetchall(sql)
 
     @staticmethod
     def create_member(input_data):
-        sql = 'INSERT INTO member (name, account, password, phone, address, identity) VALUES (%s, %s, %s, %s, %s, %s)'
+        sql = '''
+            INSERT INTO "User" ("Name", "Account", "Password", "phone", "address", "Identity") 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        '''
         DB.execute_input(sql, (input_data['name'], input_data['account'], input_data['password'], input_data['phone'], input_data['address'], input_data['identity']))
     
     @staticmethod
@@ -113,7 +116,7 @@ class Member:
 
     @staticmethod
     def get_role(userid):
-        sql = 'SELECT identity, name FROM member WHERE mid = %s'
+        sql = 'SELECT "Identity", "Name" FROM "User" WHERE "User_id" = %s'
         return DB.fetchone(sql, (userid,))
 
 
