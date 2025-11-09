@@ -51,10 +51,12 @@ def book():
     book_data = []
     for i in book_row:
         book = {
-            '商品編號': i[0],
-            '商品名稱': i[1],
-            '商品售價': i[2],
-            '商品類別': i[3]
+            '商品編號': i[0],   # "Product_id"
+            '商品名稱': i[3],   # "Name"
+            '商品售價': i[2],   # "Stock_price"
+            '商品類別': i[6],   # "Category"
+            '商品狀態': i[4],   # "Pstatus"
+            '供應商': i[1]      # "Supplier_id"
         }
         book_data.append(book)
     return book_data
@@ -73,27 +75,31 @@ def add():
         price = request.values.get('price')
         category = request.values.get('category')
         pdesc = request.values.get('description')
+        pstatus = request.values.get('pstatus')
+        supplier_id = request.values.get('supplier_id')
 
         # 檢查是否正確獲取到所有欄位的數據
-        if pname is None or price is None or category is None or pdesc is None:
+        if pname is None or price is None or category is None or pdesc is None or pstatus is None or supplier_id is None:
             flash('所有欄位都是必填的，請確認輸入內容。')
             return redirect(url_for('manager.productManager'))
 
         # 檢查欄位的長度
-        if len(pname) < 1 or len(price) < 1:
-            flash('商品名稱或價格不可為空。')
+        if len(pname) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1:
+            flash('商品名稱、價格、商品狀態、供應商不可為空。')
             return redirect(url_for('manager.productManager'))
 
 
-        if (len(pname) < 1 or len(price) < 1):
+        if (len(pname) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1):
             return redirect(url_for('manager.productManager'))
         
         Product.add_product(
-            {'pid' : pid,
-             'pname' : pname,
-             'price' : price,
-             'category' : category,
-             'pdesc':pdesc
+            {'Product_id' : pid,
+             'Name' : pname,
+             'Stock_price' : price,
+             'Category' : category,
+             'Description':pdesc,
+             'Pstatus': pstatus,
+             'Supplier_id': supplier_id
             }
         )
 
@@ -112,11 +118,13 @@ def edit():
     if request.method == 'POST':
         Product.update_product(
             {
-            'pname' : request.values.get('pname'),
-            'price' : request.values.get('price'),
-            'category' : request.values.get('category'), 
-            'pdesc' : request.values.get('description'),
-            'pid' : request.values.get('pid')
+            'Name' : request.values.get('pname'),
+            'Stock_price' : request.values.get('price'),
+            'Category' : request.values.get('category'), 
+            'Description' : request.values.get('description'),
+            'Pstatus': request.values.get('pstatus'),
+            'Supplier_id': request.values.get('supplier_id'),
+            'Product_id' : request.values.get('pid')
             }
         )
         
@@ -130,17 +138,21 @@ def edit():
 def show_info():
     pid = request.args['pid']
     data = Product.get_product(pid)
-    pname = data[1]
+    pname = data[3]
     price = data[2]
-    category = data[3]
-    description = data[4]
+    category = data[6]
+    description = data[5]
+    status = data[4]
+    supplier = data[1]
 
     product = {
         '商品編號': pid,
         '商品名稱': pname,
         '單價': price,
         '類別': category,
-        '商品敘述': description
+        '商品敘述': description,
+        '商品狀態': status,
+        '供應商': supplier
     }
     return product
 
