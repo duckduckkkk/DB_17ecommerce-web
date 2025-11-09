@@ -30,19 +30,20 @@
         <th><center>商品操作</center></th>
       </tr>
       {% for product in data %}
+      
       <tr>
-        <td> <center>{{ book.Product_id }}</center></td>
-        <td> <center>{{ book.Name }}</center></td>
-        <td> <center>{{ book.Stock_price}}</center></td>
+        <td> <center>{{ product.Product_id }}</center></td>
+        <td> <center>{{ product.Name }}</center></td>
+        <td> <center>{{ product.Stock_price}}</center></td>
         <td width="20%">
           <center>
-            <input class="form-control" type="number" onkeyup="value=value.replace(/[^\d]/g,'')" min="1" value="{{ book.數量 }}" name="{{ book.商品編號 }}">
+            <input class="form-control" type="number" onkeyup="value=value.replace(/[^\d]/g,'')" min="1" value="{{ product.Amount }}" name="{{ product.Product_id }}">
 
           </center>
         </td>
         <td>
           <center>
-            <button class="btn btn-danger" type="submit" value="{{book.商品編號}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{ book.商品名稱 }}\' 嗎？'))">
+            <button class="btn btn-danger" type="submit" value="{{product.Product_id}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{product.Name }}\' 嗎？'))">
               刪除
             </button>
           </center>

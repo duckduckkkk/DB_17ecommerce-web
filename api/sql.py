@@ -84,6 +84,11 @@ class DB:
         finally:
             DB.release(connection)
 
+class Supplier:
+    @staticmethod
+    def get_supplier_name(supplier_id):
+        sql = 'SELECT "Supplier_id" FROM "Supplier" WHERE "Supplier_id" = %s'
+        return DB.fetchall(sql, (supplier_id,))
 
 class Member:
     @staticmethod
@@ -123,24 +128,27 @@ class Member:
 class Cart:
     @staticmethod
     def check(user_id):
-        sql = '''SELECT * FROM cart, record 
-                 WHERE cart.mid = %s::bigint 
-                 AND cart.tno = record.tno::bigint'''
+        sql = '''SELECT * FROM "Cart", "Cart_info"
+                 WHERE "Cart"."User_id" = %s::bigint 
+                 AND "Cart"."Cart_id" = "Cart_info"."Cart_id"::bigint'''
         return DB.fetchone(sql, (user_id,))
 
     @staticmethod
     def get_cart(user_id):
-        sql = 'SELECT * FROM cart WHERE mid = %s'
+        """取得指定使用者的購物車"""
+        sql = 'SELECT * FROM "Cart" WHERE "User_id" = %s'
         return DB.fetchone(sql, (user_id,))
 
     @staticmethod
-    def add_cart(user_id, time):
-        sql = 'INSERT INTO cart (mid, carttime, tno) VALUES (%s, %s, nextval(\'cart_tno_seq\'))'
-        DB.execute_input(sql, (user_id, time))
+    def add_cart(user_id):
+        """新增購物車"""
+        sql = 'INSERT INTO "Cart" ("User_id") VALUES (%s)'
+        DB.execute_input(sql, (user_id,))
 
     @staticmethod
     def clear_cart(user_id):
-        sql = 'DELETE FROM cart WHERE mid = %s'
+        """清空購物車"""
+        sql = 'DELETE FROM "Cart" WHERE "User_id" = %s'
         DB.execute_input(sql, (user_id,))
 
 
@@ -153,7 +161,12 @@ class Product:
 
     @staticmethod
     def get_product(product_id):
-        sql = 'SELECT * FROM "Product" WHERE "Product_id" = %s'
+        sql = '''
+        SELECT p.*, s."Sname"
+        FROM "Product" p
+        JOIN "Supplier" s ON p."Supplier_id" = s."Supplier_id"
+        WHERE p."Product_id" = %s
+    '''
         return DB.fetchone(sql, (product_id,))
 
     @staticmethod
@@ -201,6 +214,38 @@ class Product:
             input_data['Description'],
             input_data['Product_id']
         ))
+class Cart_Info:
+    @staticmethod
+    def check_product(cart_id, product_id):
+        """檢查購物車裡是否已經有這個商品"""
+        sql = 'SELECT * FROM "Cart_Info" WHERE "Cart_id" = %s AND "Product_id" = %s'
+        return DB.fetchone(sql, (cart_id, product_id))
+
+    @staticmethod
+    def add_product(cart_id, user_id, supplier_id, product_id, amount=1):
+        """把商品加入購物車"""
+        sql = '''
+            INSERT INTO "Cart_Info" ("Cart_id", "User_id", "Supplier_id", "Product_id", "Amount")
+            VALUES (%s, %s, %s, %s, %s)
+        '''
+        DB.execute_input(sql, (cart_id, user_id, supplier_id, product_id, amount))
+
+    @staticmethod
+    def update_amount(cart_id, product_id, amount):
+        """更新商品數量"""
+        sql = 'UPDATE "Cart_Info" SET "Amount" = %s WHERE "Cart_id" = %s AND "Product_id" = %s'
+        DB.execute_input(sql, (amount, cart_id, product_id))
+
+    @staticmethod
+    def get_cart_products(cart_id):
+        """取得購物車裡所有商品"""
+        sql = '''
+            SELECT ci."Product_id", p."Name", p."Stock_price", ci."Amount", p."Supplier_id"
+            FROM "Cart_Info" ci
+            JOIN "Product" p ON ci."Product_id" = p."Product_id"
+            WHERE ci."Cart_id" = %s
+        '''
+        return DB.fetchall(sql, (cart_id,))
 
 class Record:
     @staticmethod
