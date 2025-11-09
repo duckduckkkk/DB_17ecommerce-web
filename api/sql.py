@@ -308,7 +308,7 @@ class Analysis:
             SELECT SUM(O."Total_amount") AS total_amount, U."Name"
             FROM "Order" O
             JOIN "User" U ON O."User_id" = U."User_id"
-            WHERE U."Identity" = '使用者'
+            WHERE U."Identity" = 'user'
             GROUP BY U."User_id", U."Name"
             ORDER BY total_amount DESC
         '''
@@ -320,7 +320,7 @@ class Analysis:
             SELECT COUNT(*) AS order_count, U."User_id", U."Name"
             FROM "Order" O
             JOIN "User" U ON O."User_id" = U."User_id"
-            WHERE U."Identity" = '使用者'
+            WHERE U."Identity" = 'user'
             GROUP BY U."User_id", U."Name"
             ORDER BY order_count DESC
         '''
