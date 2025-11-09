@@ -122,14 +122,13 @@
 <table id="manager" class="table table-bordered">
     <thead>
         <tr>
-            <th width="10%"><center>商品編號</center></th>
-            <th width="20%"><center>商品名稱</center></th>
-            <th width="15%"><center>商品單價</center></th>
-            <th width="15%"><center>商品類別</center></th>
-            <th width="15%"><center>商品狀態</center></th>
-            <th width="15%"><center>供應商</center></th>
-            <th width="15%" colspan="2"><center>資料操作</center></th>
-        </tr>
+            <th width="8%"><center>商品編號</center></th>  
+            <th width="25%"><center>商品名稱</center></th>  
+            <th width="10%"><center>商品單價</center></th>  
+            <th width="12%"><center>商品類別</center></th>  
+            <th width="10%"><center>商品狀態</center></th>  
+            <th width="10%"><center>供應商</center></th>    
+            <th width="25%" colspan="2"><center>資料操作</center></th> </tr>
     </thead>
     <tbody id="product">
     {% for i in book_data %}
@@ -140,8 +139,8 @@
             <td><center>{{ i.商品類別 }}</center></td>
             <td><center>{{ i.商品狀態 }}</center></td>
             <td><center>{{ i.供應商 }}</center></td>
-            <td><center><button type="submit" value="{{i.商品編號}}" name="edit" class="btn btn-success">編輯商品</button></center></td>
-            <td><center><button type="submit" value="{{i.商品編號}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{ i.商品名稱 }}\' 嗎？'))" class="btn btn-danger">刪除商品</button></center></td>
+            <td><center><button type="submit" value="{{i.商品編號}}" name="edit" class="btn btn-success w-100">編輯商品</button></center></td>
+            <td><center><button type="submit" value="{{i.商品編號}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{ i.商品名稱 }}\' 嗎？'))" class="btn btn-danger w-100">刪除商品</button></center></td>
         </tr>
     {% endfor %}
     </tbody>
