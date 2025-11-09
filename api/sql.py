@@ -99,11 +99,22 @@ class Member:
     @staticmethod
     def create_member(input_data):
         sql = '''
-            INSERT INTO "User" ("Name", "Account", "Password", "phone", "address", "Identity") 
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO "User" ("User_id", "Name", "Account", "Password", phone, address, "Identity")
+            VALUES (
+                (SELECT COALESCE(MAX("User_id"), 0) + 1 FROM "User"),
+                %s, %s, %s, %s, %s, %s
+            );
         '''
-        DB.execute_input(sql, (input_data['name'], input_data['account'], input_data['password'], input_data['phone'], input_data['address'], input_data['identity']))
-    
+        DB.execute_input(sql, (
+            input_data['name'],
+            input_data['account'],    # <-- 這裡一定要是使用者輸入的 account
+            input_data['password'],
+            input_data['phone'],
+            input_data['address'],
+            input_data['identity']
+        ))
+
+
     @staticmethod
     def delete_product(tno, pid):
         sql = 'DELETE FROM record WHERE tno = %s and pid = %s'
