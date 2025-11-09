@@ -261,7 +261,7 @@ def order():
 
 @store.route('/orderlist')
 def orderlist():
-    if "oid" in request.args :
+    if "OrderItem_id" in request.args :
         pass
     
     user_id = current_user.id
@@ -272,8 +272,9 @@ def orderlist():
     for i in data:
         temp = {
             '訂單編號': i[0],
-            '訂單總價': i[3],
-            '訂單時間': i[2]
+            '訂單總價': i[1],
+            '訂單時間': i[2],
+            '綠色運送': i[3],
         }
         orderlist.append(temp)
     
