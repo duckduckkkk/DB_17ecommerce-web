@@ -66,10 +66,9 @@ def bookstore():
         return render_template('bookstore.html', single=single, keyword=search, product_data=book_data, user=current_user.name, page=1, flag=flag, count=count) 
 
     
-    elif 'pid' in request.args and 'sid' in request.args: 
-        pid = request.args['pid']
-        sid = request.args['sid']  
-        data = Product.get_product(pid, sid)
+    elif 'pid' in request.args: 
+        pid = int(request.args['pid'])
+        data = Product.get_product(pid)
         
         pname = data[3]      
         price = data[2]      
@@ -78,8 +77,7 @@ def bookstore():
         image = 'sdg.jpg'
         
         product = {
-            'Product_id': pid,
-            'Supplier_id': sid,   
+            'Product_id': pid,  
             'Name': pname,
             'Stock_price': price,
             'Pstatus': category,
