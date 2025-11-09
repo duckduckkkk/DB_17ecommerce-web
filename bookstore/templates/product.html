@@ -28,7 +28,7 @@
 
 
 <div class="col-sm-6">
-  <form method="post" action={{ url_for('bookstore.cart') }}>
+  <form method="post" action="{{ url_for('bookstore.cart') }}">
 <div class="card" style="margin-top:10%">
   <h5 class="card-header">商品介紹</h5>
   <div class="card-body">
@@ -37,18 +37,19 @@
     </p>
     <button class="btn btn-outline-success" type="submit" value="{{data.Product_id}}" name="pid">加入購物車</button>
   </div>
-</div>
-</form>
-</div>
+  </div>
     <div class="card" style="margin-top:10%">
       <h5 class="card-header">供應商</h5>
       <div class="card-body">
         <p class="card-text">
-          {{ data.Supplier_name }}
+          {{ data.Sname }}
         </p>
       </div>
     </div>
-  </form>
+</div>
+</form>
+
+  
 </div>
 
 </div>

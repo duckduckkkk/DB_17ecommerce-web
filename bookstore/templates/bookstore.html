@@ -31,7 +31,7 @@
     <input name='keyword' class="form-control me-2" type="search" placeholder="搜尋商品" aria-label="Search">
     </div>
   </form><br/>
-  <form method="post" action={{ url_for('bookstore.cart') }}>
+  <form method="post" action="{{ url_for('bookstore.cart') }}">
       
       
       {% for product in product_data %}
