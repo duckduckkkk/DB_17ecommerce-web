@@ -250,22 +250,23 @@ def cart():
 @store.route('/order')
 def order():
     data = Cart.get_cart(current_user.id)
-    tno = data[2]
+    cart_id = data[1]
+    
 
-    product_row = Record.get_record(tno)
+    product_rows = Cart_Info.get_cart_products(cart_id)  
     product_data = []
 
-    for i in product_row:
-        pname = Product.get_name(i[1])
+    total = 0
+    for row in product_rows:
         product = {
-            '商品編號': i[1],
-            '商品名稱': pname,
-            '商品價格': i[3],
-            '數量': i[2]
+            '商品編號': row[0],
+            '商品名稱': row[1],
+            '商品價格': float(row[2]),
+            '數量': row[3]
         }
+        total += float(row[2]) * int(row[3])
         product_data.append(product)
     
-    total = float(Record.get_total(tno))  # 將 Decimal 轉換為 float
 
 
     return render_template('order.html', data=product_data, total=total, user=current_user.name)
@@ -305,20 +306,16 @@ def orderlist():
     return render_template('orderlist.html', data=orderlist, detail=orderdetail, user=current_user.name)
 def change_order():
     data = Cart.get_cart(current_user.id)
-    tno = data[2] # 使用者有購物車了，購物車的交易編號是什麼
-    product_row = Record.get_record(data[2])
+    cart_id = data[1]
+    product_rows = Cart_Info.get_cart_products(cart_id)
 
-    for i in product_row:
-        
-        # i[0]：交易編號 / i[1]：商品編號 / i[2]：數量 / i[3]：價格
-        if int(request.form[i[1]]) != i[2]:
-            Record.update_product({
-                'amount':request.form[i[1]],
-                'pid':i[1],
-                'tno':tno,
-                'total':int(request.form[i[1]])*int(i[3])
-            })
-            print('change')
+    for row in product_rows:
+        product_id = row[0]
+        current_amount = row[3]
+        new_amount = int(request.form.get(str(product_id), current_amount))
+        if new_amount != current_amount:
+            Cart_Info.update_amount(cart_id, product_id, new_amount)
+            print(f'Product {product_id} amount changed: {current_amount} -> {new_amount}')
 
     return 0
 
