@@ -1,39 +1,202 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
+<style>
+body { background: #fff; overflow-x: hidden; }
+
+/* 登入區塊 */
+.outer_div {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background-color: rgba(255,255,255,0.85);
+    border: 2px dashed rgba(25,167,100,0.5);
+    border-radius: 20px;
+    padding: 50px 60px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    display: inline-block;
+    position: relative;
+}
+
+.outer_div::before,
+.outer_div::after {
+    content: '';
+    position: absolute;
+    width: 100px; height: 100px;
+    border: 2px dotted rgba(25,167,100,0.4);
+    border-radius: 50%;
+}
+.outer_div::before { top: -20px; left: -20px; }
+.outer_div::after { bottom: -20px; right: -20px; }
+
+.icon { width: 80px; margin-bottom: 20px; }
+.register_title { font-size: 2.5rem; font-weight: 700; color: #0d6040; margin-bottom: 20px; }
+.form_div { display: flex; flex-direction: column; align-items: center; }
+input { padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); width: 250px; margin-top: 5px; }
+.btn-row { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.register_btn {
+    background: linear-gradient(90deg,#0d8485,#19a764);
+    border: none; color: white;
+    padding: 10px 25px; font-size: 1.1rem; border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.register_btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.same_accoount { color: red; font-size: 0.95rem; margin-top: 5px; }
+
+/* 飄落葉子 */
+.falling-leaf {
+    position: fixed; top: -50px;
+    width: 30px; height: 30px; fill: #19a764;
+    animation: fall linear infinite;
+}
+@keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0.7; }
+}
+.register_btn {
+    background: linear-gradient(90deg, #0d8485, #19a764);
+    border: none;
+    color: white;
+    padding: 10px 25px;  /* 內距左右上下一致 */
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;       /* 讓文字置中 */
+    align-items: center;        /* 垂直置中 */
+    justify-content: center;    /* 水平置中 */
+    text-align: center;         /* 防止換行錯位 */
+    transition: all 0.3s ease;
+}
+body {
+    background-color: #fff;
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px dashed #19a764;
+    border-radius: 20px;
+    padding: 50px 70px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+}
+
+.login-box h1 {
+    color: #0d6040;
+    margin-bottom: 30px;
+}
+
+.login-box p {
+    margin-bottom: 20px;
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.login-btn {
+    background: linear-gradient(90deg, #0d8485, #19a764);
+    border: none;
+    color: white;
+    padding: 12px 35px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.login-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.error-msg {
+    color: red;
+    font-size: 0.9rem;
+}
+
+</style>
 {% endblock head %}
 
-{% block title %}Login Page{% endblock title%}
+{% block title %}Login Page{% endblock title %}
 
-{% block content%}
-<div class="position-absolute top-50 start-50 translate-middle outer_div ">
-    <a href="{{ url_for('index') }}"><img class="icon" src="{{ url_for('static', filename='./img/home.png') }}"></a>
-    <h1 class="register_title mb-4 mt-4">會員登入</h1>
-    <div class="form_div">
-        <form  method='post' action={{ url_for('api.login') }} >
-            <p class="mb-4">
-                帳號：<input type="text" name="account" required/>
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <!-- 葉子 logo -->
+        <svg class="logo" viewBox="0 0 24 24" width="80" height="80" fill="#19a764" style="margin-bottom:20px;">
+            <path d="M12 2C10 6 4 8 4 14c0 4 4 8 8 8s8-4 8-8c0-6-6-8-8-12z"/>
+        </svg>
+
+        <h1>會員登入</h1>
+        <form method="post" action="{{ url_for('api.login') }}">
+            <p>帳號<input type="text" 
+                name="account" 
+                required 
+                pattern="^[A-Za-z0-9_]+$" 
+                title="帳號只能包含英文字母、數字或底線">
             </p>
-            <p class="mb-4">
-                密碼：<input type="password" name="password" required/>
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                
-                <p class="same_accoount">
-                    {% for i in messages %}
-                        {{ i }}
-                    {% endfor %}
-                </p>
-                {% endif %}
-                {% endwith %}
+
+            <p>密碼<input type="password" name="password" required></p>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <p class="error-msg">
+                {% for i in messages %}{{ i }}{% endfor %}
             </p>
-            <p class="mb-4">
-                <a href="{{ url_for('index') }}">
-                    <button type="button" class="register_btn">回上頁</button>
-                </a>
-                <button type="submit" class="register_btn">登入</button>
-            </p>
+            {% endif %}
+            {% endwith %}
+            <div class="btn-row">
+                <a href="{{ url_for('index') }}" class="login-btn">回上頁</a>
+                <button type="submit" class="login-btn">登入</button>
+            </div>
         </form>
     </div>
 </div>
-{% endblock content%}
+
+
+<div id="falling-leaves"></div>
+<script>
+function startFallingLeaves(){
+    const container = document.getElementById('falling-leaves');
+    for(let i=0;i<15;i++){
+        let leaf = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        leaf.setAttribute("class","falling-leaf");
+        leaf.setAttribute("viewBox","0 0 24 24");
+        leaf.style.left = Math.random()*95 + "vw";
+        leaf.style.animationDuration = (5+Math.random()*5)+"s";
+        leaf.style.width = (20+Math.random()*20)+"px";
+        leaf.style.height = (20+Math.random()*20)+"px";
+        let path = document.createElementNS("http://www.w3.org/2000/svg","path");
+        path.setAttribute("d","M12 2C10 6 4 8 4 14c0 4 4 8 8 8s8-4 8-8c0-6-6-8-8-12z");
+        leaf.appendChild(path);
+        container.appendChild(leaf);
+    }
+}
+window.addEventListener("load", startFallingLeaves);
+</script>
+{% endblock content %}
