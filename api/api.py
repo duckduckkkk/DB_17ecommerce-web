@@ -75,7 +75,9 @@ def register():
             input = { 
                 'name': request.form['username'], 
                 'account':user_account, 
-                'password':request.form['password'], 
+                'password':request.form['password'],
+                'phone': request.form['phone'],     
+                'address': request.form['address'], 
                 'identity':request.form['identity'] 
             }
             Member.create_member(input)

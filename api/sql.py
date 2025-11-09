@@ -98,9 +98,9 @@ class Member:
 
     @staticmethod
     def create_member(input_data):
-        sql = 'INSERT INTO member (name, account, password, identity) VALUES (%s, %s, %s, %s)'
-        DB.execute_input(sql, (input_data['name'], input_data['account'], input_data['password'], input_data['identity']))
-
+        sql = 'INSERT INTO member (name, account, password, phone, address, identity) VALUES (%s, %s, %s, %s, %s, %s)'
+        DB.execute_input(sql, (input_data['name'], input_data['account'], input_data['password'], input_data['phone'], input_data['address'], input_data['identity']))
+    
     @staticmethod
     def delete_product(tno, pid):
         sql = 'DELETE FROM record WHERE tno = %s and pid = %s'
