@@ -111,7 +111,7 @@ class Member:
 
     @staticmethod
     def get_order(userid):
-        sql = 'SELECT * FROM order_list WHERE mid = %s ORDER BY ordertime DESC'
+        sql = 'SELECT * FROM "Order" WHERE "User_id" = %s ORDER BY "Order_date" DESC'
         return DB.fetchall(sql, (userid,))
 
     @staticmethod
@@ -262,7 +262,7 @@ class Order_List:
                    U."Name" AS 訂購人,
                    O."Total_amount" AS 訂單總價,
                    O."Order_date" AS 訂單時間,
-                   CASE WHEN O."Green_delivery" ILIKE 'Y' THEN 'Y' ELSE 'N' END AS 綠色運送
+                   O."Green_delivery" AS 綠色運送            
             FROM "Order" O
             JOIN "User" U ON O."User_id"= U."User_id"
             ORDER BY O."Order_date" DESC

@@ -158,7 +158,8 @@ def orderManager():
                 '訂單編號': i[0],
                 '訂購人': i[1],
                 '訂單總價': i[2],
-                '訂單時間': i[3]
+                '訂單時間': i[3],
+                '綠色運送': i[4],
             }
             order_data.append(order)
             
@@ -170,7 +171,7 @@ def orderManager():
                 '訂單編號': j[0],
                 '商品名稱': j[1],
                 '商品單價': j[2],
-                '訂購數量': j[3]
+                '訂購數量': j[3],
             }
             order_detail.append(orderdetail)
 
