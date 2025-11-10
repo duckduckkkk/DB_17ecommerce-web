@@ -179,7 +179,13 @@ class Product:
         WHERE p."Product_id" = %s
     '''
         return DB.fetchone(sql, (product_id,))
-
+    
+    @staticmethod
+    def get_product_by_pid(product_id):
+        # 假設 "Product_id" 在資料庫中是唯一的
+        sql = 'SELECT * FROM "Product" WHERE "Product_id" = %s'
+        return DB.fetchone(sql, (product_id,))
+    
     @staticmethod
     def get_all_product():
         sql = 'SELECT * FROM "Product"'
@@ -193,17 +199,24 @@ class Product:
 
     @staticmethod
     def add_product(input_data):
+        # 1. SQL 語句加入 "Category" 欄位
         sql = '''
-            INSERT INTO "Product" ("Product_id", "Stock_price", "Name", "Pstatus", "Description")
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO "Product" ("Product_id", "Supplier_id", "Stock_price", "Name", "Pstatus", "Description", "Category")
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         '''
-        DB.execute_input(sql, (
+        
+        # 2. 傳入的 tuple 資料也加入 "Category"
+        # (鍵名 'Category' 必須和 manager.py 傳來的一致)
+        val = (
             input_data['Product_id'],
+            input_data['Supplier_id'],
             input_data['Stock_price'],
             input_data['Name'],
             input_data['Pstatus'],
-            input_data['Description']
-        ))
+            input_data['Description'],
+            input_data['Category'] # 新增 'Category'
+        )
+        DB.execute_input(sql, val)
 
     @staticmethod
     def delete_product(product_id):
@@ -215,16 +228,28 @@ class Product:
     def update_product(input_data):
         sql = '''
             UPDATE "Product"
-            SET "Stock_price" = %s, "Name" = %s, "Pstatus" = %s, "Description" = %s
+            SET "Stock_price" = %s, 
+                "Name" = %s, 
+                "Pstatus" = %s, 
+                "Description" = %s,
+                "Supplier_id" = %s,
+                "Category" = %s
             WHERE "Product_id" = %s
         '''
-        DB.execute_input(sql, (
+        
+        # 2. 傳入的 tuple 資料也加入 "Category"
+        # (鍵名 'Category' 必須和 manager.py 傳來的一致)
+        val = (
             input_data['Stock_price'],
             input_data['Name'],
             input_data['Pstatus'],
             input_data['Description'],
-            input_data['Product_id']
-        ))
+            input_data['Supplier_id'],
+            input_data['Category'], # 新增 'Category'
+            input_data['Product_id'] # Product_id 放在最後對應 WHERE
+        )
+        DB.execute_input(sql, val)
+    
 class Cart_Info:
     @staticmethod
     def check_product(cart_id, product_id):
