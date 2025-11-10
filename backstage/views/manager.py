@@ -63,6 +63,7 @@ def book():
 
 
 @manager.route('/add', methods=['GET', 'POST'])
+@login_required
 def add():
     if request.method == 'POST':
         pname = request.values.get('pname')
@@ -72,40 +73,35 @@ def add():
         supplier_name = request.values.get('supplier_name')
         supplier_contact = request.values.get('supplier_contact')
 
-        # === 檢查必填欄位 ===
         if not all([pname, price, category, pdesc, supplier_name, supplier_contact]):
             flash('所有欄位都是必填的，請確認輸入內容。')
             return redirect(url_for('manager.productManager'))
 
-        # === 查詢是否有相同廠商 ===
         existing_supplier = Supplier.get_supplier_by_name(supplier_name)
 
         if existing_supplier:
-            existing_id = existing_supplier[0]
-            existing_name = existing_supplier[1]
-            existing_contact = existing_supplier[2]
-
-            if existing_contact != supplier_contact:
+            supplier_id = existing_supplier[0]
+            if existing_supplier[2] != supplier_contact:
                 flash('廠商名稱或聯絡資訊錯誤，請重新確認。')
                 return redirect(url_for('manager.productManager'))
 
-            supplier_id = existing_id  # 直接沿用原本 Supplier_id
+            # 使用 SQL 檢查商品是否存在
+            if Product.check_product_exists(pname, supplier_id):
+                flash(f'商品「{pname}」已存在於該供應商底下，請勿重複新增。')
+                return redirect(url_for('manager.productManager'))
+
         else:
-            # 沒有找到 → 新增新廠商
             max_id = Supplier.get_max_supplier_id()
             supplier_id = max_id + 1 if max_id else 1
-
             Supplier.add_supplier({
                 'Supplier_id': supplier_id,
                 'Sname': supplier_name,
                 'Contact_info': supplier_contact
             })
 
-        # === 生成新的商品 ID ===
         max_pid = Product.get_max_product_id()
         pid = max_pid + 1 if max_pid else 1
 
-        # === 寫入 Product ===
         Product.add_product({
             'Product_id': pid,
             'Supplier_id': supplier_id,
