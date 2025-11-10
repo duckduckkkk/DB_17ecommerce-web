@@ -69,13 +69,13 @@ def add():
         price = request.values.get('price')
         category = request.values.get('category')
         pdesc = request.values.get('description')
-        pstatus = request.values.get('pstatus')
+        # pstatus = request.values.get('pstatus')
         supplier_name = request.values.get('supplier_name')
         supplier_contact = request.values.get('supplier_contact')
         print('supplier_name:', supplier_name, 'supplier_contact:', supplier_contact)
 
         # === 檢查必填欄位 ===
-        if not all([pname, price, category, pdesc, pstatus, supplier_name, supplier_contact]):
+        if not all([pname, price, category, pdesc, supplier_name, supplier_contact]):
             flash('所有欄位都是必填的，請確認輸入內容。')
             return redirect(url_for('manager.productManager'))
 
@@ -113,7 +113,7 @@ def add():
             'Supplier_id': supplier_id,
             'Stock_price': price,
             'Name': pname,
-            'Pstatus': pstatus,
+            # 'Pstatus': pstatus,
             'Description': pdesc,
             'Category': category,
         })
@@ -138,7 +138,7 @@ def edit():
             'Stock_price' : request.values.get('price'),
             'Category' : request.values.get('Category'), 
             'Description' : request.values.get('description'),
-            'Pstatus': request.values.get('Pstatus'),
+            # 'Pstatus': request.values.get('Pstatus'),
             'Supplier_id': request.values.get('Supplier_id'),
             'Product_id' : request.values.get('pid')
             }
@@ -163,7 +163,7 @@ def show_info():
     price = data[2]
     category = data[6]
     description = data[5]
-    status = data[4]
+    # status = data[4]
     supplier = data[1]
 
     product = {
