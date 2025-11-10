@@ -8,7 +8,7 @@
 {% block content%}
 <br/>
 <div class="container-xl">
-  <form method="post" action={{ url_for('bookstore.cart') }}>
+  <form method="post" action="{{url_for('bookstore.confirm_order') }}">
     <table class="table table-bordered">
       <tr>
         <th><center>商品編號</center></th>
@@ -59,9 +59,9 @@
     
     <center> 
       <div class="option">
-        <a href="{{ url_for('bookstore.cart') }}"><button class="btn btn-primary" type="submit" >回購物車</button></a>
-        <button class="btn btn-success" type="submit" value="order" name="order">下訂單</button>
-    </div>
+        <a href="{{ url_for('bookstore.cart') }}" class="btn btn-primary">回購物車</a>
+        <button class="btn btn-success" type="submit" name="order" value="order">下訂單</button>
+      </div>
     </center>
 
   </form>
