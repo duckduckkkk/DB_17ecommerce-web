@@ -1,76 +1,104 @@
 {% extends "frontstage.html" %}
 {% block head %}
 {{ super() }}
+<style>
+  .cart-container {
+    max-width: 900px;
+    margin: 40px auto;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+
+  .cart-info {
+    flex: 2;
+  }
+
+  .cart-actions {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .cart-actions input[type="number"] {
+    width: 70px;
+    text-align: center;
+  }
+
+  .bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+  }
+
+  .bottom-buttons button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+  }
+
+  .btn-success {
+    background-color: #28a745;
+  }
+
+  .bottom-buttons button:hover {
+    opacity: 0.85;
+  }
+</style>
 {% endblock head %}
 
-{% block title %}購物車清單{% endblock title%}
+{% block title %}購物車清單{% endblock title %}
 
 {% block content %}
-
-{% with messages = get_flashed_messages() %}
-{% if messages[0] == 'No permission' %}
-  
-<script language="javascript">
-  alert('您沒有使用者的權限喔！');
-</script>
-
-{% endif %}
-{% endwith %}
-
-<br/>
-<div class="container-xl">
-  <br/>
+<div class="container cart-container">
   <form method="post" action="{{ url_for('bookstore.cart') }}">
-    <table class="table table-bordered">
-      <tr>
-        <th><center>商品編號</center></th>
-        <th><center>商品名稱</center></th>
-        <th><center>商品價格</center></th>
-        <th><center>數量</center></th>
-        <th>商品狀態</th>
-        <th><center>商品操作</center></th>
-      </tr>
-      {% for product in data %}
-      
-      <tr>
-        <td> <center>{{ product.Product_id }}</center></td>
-        <td> <center>{{ product.Name }}</center></td>
-        <td> <center>{{ product.Stock_price}}</center></td>
-        <td width="20%">
-          <center>
-            <input class="form-control" type="number" onkeyup="value=value.replace(/[^\d]/g,'')" min="1" value="{{ product.Amount }}" name="{{ product.Product_id }}">
 
-          </center>
-        </td>
-        <td>
-          <select name="condition_{{ product.Product_id }}">
-            <option value="new" selected>全新</option>
-            <option value="used">二手</option>
-          </select>
-        </td>
-        <td>
-          <center>
-            <button class="btn btn-danger" type="submit" value="{{product.Product_id}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{product.Name }}\' 嗎？'))">
-              刪除
-            </button>
-          </center>
-      </td>
-      </tr>
-      {% endfor %}
-    </table>
+    {% for product in data %}
+    <div class="cart-item">
+      <div class="cart-info">
+        <h5>{{ product.Name }}</h5>
+        <p>商品編號：{{ product.Product_id }}</p>
+        <p>單價：NT${{ product.Stock_price }}</p>
+        <select name="condition_{{ product.Product_id }}">
+          <option value="new" selected>全新</option>
+          <option value="used">二手</option>
+        </select>
+      </div>
+
+      <div class="cart-actions">
+        <input class="form-control" type="number" min="1" value="{{ product.Amount }}" name="{{ product.Product_id }}">
+        <button class="btn btn-danger" type="submit" value="{{product.Product_id}}" name="delete" onclick="return confirm('確定刪除 {{product.Name}} 嗎？')">刪除</button>
+      </div>
+    </div>
+    {% endfor %}
+
     <div>
       <input type="checkbox" name="green_delivery" value="Y"> 綠色運送（選擇後運費 30，否則 50）
     </div>
-    <center>
-      <div class="option">
-        <button class="btn btn-primary" type="submit" value="edit" name="user_edit" >繼續購物</button>
-        <button class="btn btn-success" type="submit" value="edit" name="buy" >直接結帳</button>
-      </div>
-    </center>
 
+    <div class="bottom-buttons">
+      <button class="btn btn-primary" type="submit" name="user_edit">繼續購物</button>
+      <button class="btn btn-success" type="submit" name="buy">直接結帳</button>
+    </div>
 
   </form>
-
 </div>
-
-{% endblock content%}
+{% endblock content %}

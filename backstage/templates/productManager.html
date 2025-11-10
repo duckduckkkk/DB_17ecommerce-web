@@ -1,13 +1,66 @@
 {% extends "backstage.html" %}
 {% block head %}
 {{ super() }}
+<style>
+  .product-container {
+    max-width: 1000px;
+    margin: 30px auto;
+  }
+
+  .product-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .product-info {
+    flex: 3;
+  }
+
+  .product-info h5 {
+    margin-bottom: 5px;
+  }
+
+  .product-info p {
+    margin: 0;
+    color: #555;
+  }
+
+  .product-actions {
+    flex: 1;
+    text-align: right;
+  }
+
+  .product-actions button {
+    width: 48%;
+  }
+
+  .search-add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+
+  .search-add .form-control {
+    max-width: 250px;
+  }
+
+  hr {
+    border-top: 2px solid #eee;
+  }
+</style>
 {% endblock head %}
 
-{% block title %} 商品管理 {% endblock title %}
+{% block title %}商品管理{% endblock title %}
 
 {% block content %}
-
-<!-- Flash messages alert -->
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <script>
@@ -21,112 +74,96 @@
 {% endwith %}
 
 <script>
-    $(document).ready(function(){
-        $("#keyword").on("keyup", function() {
-            var value = $(this).val().toLowerCase();
-            $("#product tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });
+$(document).ready(function(){
+  $("#keyword").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $(".product-card").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
+  });
+});
 </script>
 
-&nbsp;
-&nbsp;
-<div class="d-flex justify-content-between container-xxl">
-    <div class="d-flex col-sm-4">
-        <span class="input-group-text" id="basic-addon1">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-          </svg>
-        </span>
-        <input class="form-control me-2" id="keyword" placeholder="搜尋商品" aria-label="Search">
+<div class="container product-container">
+
+  <div class="search-add">
+  <div class="search-box">
+    <i class="bi bi-search search-icon"></i>
+    <input class="form-control search-input" id="keyword" placeholder="搜尋商品...">
+  </div>
+
+  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    新增商品
+  </button>
+</div>
+
+
+  <form method="post" action="{{ url_for('manager.productManager') }}">
+    {% for i in book_data %}
+    <div class="product-card">
+      <div class="product-info">
+        <h5>{{ i.商品名稱 }}</h5>
+        <p>商品編號：{{ i.商品編號 }}</p>
+        <p>售價：NT${{ i.商品售價 }}</p>
+        <p>類別：{{ i.商品類別 }}　|　供應商：{{ i.供應商名稱 }}</p>
+      </div>
+      <div class="product-actions">
+        <button type="submit" value="{{ i.商品編號 }}" name="edit" class="btn btn-success">編輯</button>
+        <button type="submit" value="{{ i.商品編號 }}" name="delete" class="btn btn-danger"
+          onclick="return confirm('確定刪除 {{ i.商品名稱 }} 嗎？')">刪除</button>
+      </div>
     </div>
-    <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-        新增商品
-    </button>
+    {% endfor %}
+  </form>
 </div>
 
 <!-- 新增商品 Modal -->
 <form method="post" enctype="multipart/form-data" action="{{ url_for('manager.add') }}">
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">新增商品</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="inputProductName" class="form-label">商品名稱</label>
-                        <input type="text" class="form-control" id="inputProductName" name="pname" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="inputUnitPrice" class="form-label">商品單價</label>
-                        <input type="number" class="form-control" id="inputUnitPrice" name="price" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="inputProductCategory" class="form-label">商品種類</label>
-                        <select id="inputProductCategory" class="form-select" name="category" required>
-                            <option selected disabled value="">請選擇類型</option>
-                            <option value="上身">上身</option>
-                            <option value="下身">下身</option>
-                            <option value="其他">其他</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="inputProductDesc" class="form-label">商品敘述</label>
-                        <textarea class="form-control" id="inputProductDesc" name="description" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="inputSupplierName" class="form-label">供應商名稱</label>
-                        <input type="text" class="form-control" id="inputSupplierName" name="supplier_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="inputSupplierContact" class="form-label">供應商聯絡資訊</label>
-                        <input type="text" class="form-control" id="inputSupplierContact" name="supplier_contact" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-success">確定新增</button>
-                </div>
-            </div>
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">新增商品</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">商品名稱</label>
+            <input type="text" class="form-control" name="pname" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">商品單價</label>
+            <input type="number" class="form-control" name="price" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">商品種類</label>
+            <select class="form-select" name="category" required>
+              <option selected disabled value="">請選擇類型</option>
+              <option value="上身">上身</option>
+              <option value="下身">下身</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">商品敘述</label>
+            <textarea class="form-control" name="description" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">供應商名稱</label>
+            <input type="text" class="form-control" name="supplier_name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">供應商聯絡資訊</label>
+            <input type="text" class="form-control" name="supplier_contact" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-success">確定新增</button>
+        </div>
+      </div>
     </div>
+  </div>
 </form>
-
-<br/>
-
-<!-- 商品列表 -->
-<div class="container-xxl">
-<form method='post' action={{ url_for('manager.productManager') }}>
-<table id="manager" class="table table-bordered">
-    <thead>
-        <tr>
-            <th width="8%"><center>商品編號</center></th>  
-            <th width="25%"><center>商品名稱</center></th>  
-            <th width="10%"><center>商品單價</center></th>  
-            <th width="12%"><center>商品類別</center></th>    
-            <th width="10%"><center>供應商</center></th>    
-            <th width="25%" colspan="2"><center>資料操作</center></th>
-        </tr>
-    </thead>
-    <tbody id="product">
-    {% for i in book_data %}
-        <tr>
-            <td><center>{{ i.商品編號 }}</center></td>
-            <td><center>{{ i.商品名稱 }}</center></td>
-            <td><center>{{ i.商品售價 }}</center></td>
-            <td><center>{{ i.商品類別 }}</center></td>
-            <td><center>{{ i.供應商名稱 }}</center></td>
-            <td><center><button type="submit" value="{{i.商品編號}}" name="edit" class="btn btn-success w-100">編輯商品</button></center></td>
-            <td><center><button type="submit" value="{{i.商品編號}}" name="delete" onclick="return confirm('你確定要刪除 \'{{ i.商品名稱 }}\' 嗎？')" class="btn btn-danger w-100">刪除商品</button></center></td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-</form>
-</div>
 
 {% endblock content %}
