@@ -53,23 +53,7 @@
           <textarea class="form-control" name="description">{{ data.商品敘述 }}</textarea>
         </td>
       </tr>
-      <tr>
-        <th>商品狀態</th>
-        <td>
-          <select class="form-control" name="Pstatus">
-            {% if data.商品狀態 == '全新' %}
-              <option value="全新" selected>全新</option>
-              <option value="二手">二手</option>
-            {% elif data.商品狀態 == '二手' %}
-              <option value="全新">全新</option>
-              <option value="二手" selected>二手</option>
-            {% else %}
-              <option value="全新">全新</option>
-              <option value="二手">二手</option>
-            {% endif %}    
-          </select>
-        </td>
-      </tr>
+      
       <tr>
         <th>供應商</th>
         <td><input class="form-control" type="text" value="{{ data.供應商 }}" name="Supplier_id" required></td>
