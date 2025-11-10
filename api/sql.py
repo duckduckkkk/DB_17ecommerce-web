@@ -199,10 +199,16 @@ class Cart:
 
     @staticmethod
     def add_cart(user_id):
-        """新增購物車"""
-        sql = 'INSERT INTO "Cart" ("User_id") VALUES (%s)'
-        DB.execute_input(sql, (user_id,))
+        # 先取得目前最大 Cart_id
+        max_id = DB.fetchone('SELECT MAX("Cart_id") FROM "Cart"')[0] or 0
+        next_cart_id = max_id + 1
 
+        # 插入新購物車
+        sql = 'INSERT INTO "Cart" ("Cart_id", "User_id") VALUES (%s, %s)'
+        DB.execute_input(sql, (next_cart_id, user_id))
+
+        # 回傳新 cart_id
+        return next_cart_id
     @staticmethod
     def clear_cart(user_id):
         """清空購物車"""
