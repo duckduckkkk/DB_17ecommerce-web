@@ -135,10 +135,10 @@ def edit():
             {
             'Name' : request.values.get('pname'),
             'Stock_price' : request.values.get('price'),
-            'Category' : request.values.get('category'), 
+            'Category' : request.values.get('Category'), 
             'Description' : request.values.get('description'),
-            'Pstatus': request.values.get('pstatus'),
-            'Supplier_id': request.values.get('supplier_id'),
+            'Pstatus': request.values.get('Pstatus'),
+            'Supplier_id': request.values.get('Supplier_id'),
             'Product_id' : request.values.get('pid')
             }
         )
@@ -147,12 +147,17 @@ def edit():
 
     else:
         product = show_info()
+        if not product:
+            flash('找不到該商品')
+            return redirect(url_for('manager.productManager'))
         return render_template('edit.html', data=product)
 
 
 def show_info():
     pid = request.args['pid']
-    data = Product.get_product(pid)
+    data = Product.get_product_by_pid(pid)
+    if data is None:
+        return None
     pname = data[3]
     price = data[2]
     category = data[6]
