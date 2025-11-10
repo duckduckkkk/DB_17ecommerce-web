@@ -47,19 +47,20 @@ def productManager():
     return render_template('productManager.html', book_data = book_data, user=current_user.name)
 
 def book():
-    book_row = Product.get_all_product()
+    book_row = Product.get_all_product_with_supplier()
     book_data = []
     for i in book_row:
         book = {
-            '商品編號': i[0],   # "Product_id"
-            '商品名稱': i[3],   # "Name"
-            '商品售價': i[2],   # "Stock_price"
-            '商品類別': i[6],   # "Category"
-            '商品狀態': i[4],   # "Pstatus"
-            '供應商': i[1]      # "Supplier_id"
+            '商品編號': i[0],   # Product_id
+            '商品名稱': i[1],   # Name
+            '商品售價': i[2],   # Stock_price
+            '商品類別': i[3],   # Category
+            '供應商名稱': i[6],  # Sname
+            '供應商編號': i[5]   # Supplier_id
         }
         book_data.append(book)
     return book_data
+
 
 @manager.route('/add', methods=['GET', 'POST'])
 def add():
@@ -171,7 +172,6 @@ def show_info():
         '單價': price,
         '類別': category,
         '商品敘述': description,
-        '商品狀態': status,
         '供應商': supplier
     }
     return product
