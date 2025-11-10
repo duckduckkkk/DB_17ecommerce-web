@@ -191,6 +191,22 @@ class Cart:
 
 class Product:
     @staticmethod
+    def get_all_product_with_supplier():
+        sql = '''
+        SELECT 
+            p."Product_id",
+            p."Name",
+            p."Stock_price",
+            p."Category",
+            p."Description",
+            p."Supplier_id",
+            s."Sname"
+        FROM "Product" p
+        JOIN "Supplier" s ON p."Supplier_id" = s."Supplier_id"
+        ORDER BY p."Product_id"
+        '''
+        return DB.fetchall(sql)
+    @staticmethod
     def get_max_product_id():
         """取得 Product 表最大 Product_id"""
         sql = 'SELECT MAX("Product_id") FROM "Product"'
