@@ -7,29 +7,17 @@
 
 {% block content %}
 
+<!-- Flash messages alert -->
 {% with messages = get_flashed_messages() %}
-{% if messages[0] == 'No permission' %}
-  
-<script language="javascript">
-
-  alert('您沒有使用者的權限喔！');
-
-</script>
-
-
-{% endif %}
-{% endwith %}
-
-{% with messages = get_flashed_messages() %}
-{% if messages[0] == 'failed' %}
-  
-<script language="javascript">
-
-  alert('有使用者有使用到這筆資料，所以不能刪除');
-
-</script>
-
-{% endif %}
+  {% if messages %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function(){
+        {% for msg in messages %}
+          alert("{{ msg }}");
+        {% endfor %}
+      });
+    </script>
+  {% endif %}
 {% endwith %}
 
 <script>
@@ -42,6 +30,7 @@
         });
     });
 </script>
+
 &nbsp;
 &nbsp;
 <div class="d-flex justify-content-between container-xxl">
@@ -58,7 +47,8 @@
     </button>
 </div>
 
-<form method="post" enctype=multipart/form-data action={{ url_for('manager.add') }}>
+<!-- 新增商品 Modal -->
+<form method="post" enctype="multipart/form-data" action="{{ url_for('manager.add') }}">
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -69,15 +59,15 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="inputProductName" class="form-label">商品名稱</label>
-                        <input type="text" class="form-control" id="inputProductName" name="Name" required>
+                        <input type="text" class="form-control" id="inputProductName" name="pname" required>
                     </div>
                     <div class="mb-3">
                         <label for="inputUnitPrice" class="form-label">商品單價</label>
-                        <input type="number" class="form-control" id="inputUnitPrice" name="Stock_price" required>
+                        <input type="number" class="form-control" id="inputUnitPrice" name="price" required>
                     </div>
                     <div class="mb-3">
                         <label for="inputProductCategory" class="form-label">商品種類</label>
-                        <select id="inputProductCategory" class="form-select" name="Category" required>
+                        <select id="inputProductCategory" class="form-select" name="category" required>
                             <option selected disabled value="">請選擇類型</option>
                             <option value="上身">上身</option>
                             <option value="下身">下身</option>
@@ -86,24 +76,24 @@
                     </div>
                     <div class="mb-3">
                         <label for="inputProductDesc" class="form-label">商品敘述</label>
-                        <textarea class="form-control" id="inputProductDesc" name="Description" required></textarea>
+                        <textarea class="form-control" id="inputProductDesc" name="description" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="inputProductStatus" class="form-label">商品狀態</label>
-                        <select id="inputProductStatus" class="form-select" name="Pstatus" required>
+                        <select id="inputProductStatus" class="form-select" name="pstatus" required>
                             <option selected disabled value="">請選擇狀態</option>
                             <option value="全新">全新</option>
                             <option value="二手">二手</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="inputSupplierId" class="form-label">供應商</label>
-                        <input type="text" class="form-control" id="inputSupplierId" name="Supplier_id" required>
+                        <label for="inputSupplierName" class="form-label">供應商名稱</label>
+                        <input type="text" class="form-control" id="inputSupplierName" name="supplier_name" required>
                     </div>
-                    <!-- <div class="mb-3">
-                        <label for="inputProductImg" class="form-label">商品圖片</label><br/>
-                        <input type="file" name="file" id="file-uploader" data-target="file-uploader" required/>
-                    </div> -->
+                    <div class="mb-3">
+                        <label for="inputSupplierContact" class="form-label">供應商聯絡資訊</label>
+                        <input type="text" class="form-control" id="inputSupplierContact" name="supplier_contact" required>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">取消</button>
@@ -116,9 +106,9 @@
 
 <br/>
 
+<!-- 商品列表 -->
 <div class="container-xxl">
-
-<form method='post' action={{ url_for('manager.productManager') }} >
+<form method='post' action={{ url_for('manager.productManager') }}>
 <table id="manager" class="table table-bordered">
     <thead>
         <tr>
@@ -128,7 +118,8 @@
             <th width="12%"><center>商品類別</center></th>  
             <th width="10%"><center>商品狀態</center></th>  
             <th width="10%"><center>供應商</center></th>    
-            <th width="25%" colspan="2"><center>資料操作</center></th> </tr>
+            <th width="25%" colspan="2"><center>資料操作</center></th>
+        </tr>
     </thead>
     <tbody id="product">
     {% for i in book_data %}
@@ -140,21 +131,12 @@
             <td><center>{{ i.商品狀態 }}</center></td>
             <td><center>{{ i.供應商 }}</center></td>
             <td><center><button type="submit" value="{{i.商品編號}}" name="edit" class="btn btn-success w-100">編輯商品</button></center></td>
-            <td><center><button type="submit" value="{{i.商品編號}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{ i.商品名稱 }}\' 嗎？'))" class="btn btn-danger w-100">刪除商品</button></center></td>
+            <td><center><button type="submit" value="{{i.商品編號}}" name="delete" onclick="return confirm('你確定要刪除 \'{{ i.商品名稱 }}\' 嗎？')" class="btn btn-danger w-100">刪除商品</button></center></td>
         </tr>
     {% endfor %}
     </tbody>
-    
 </table>
 </form>
-
-
 </div>
-
-<script>
-    function have_product(){
-      alert('有使用者有使用到這筆資料，所以不能刪除');
-    }
-</script>
 
 {% endblock content %}
