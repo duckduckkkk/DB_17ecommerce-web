@@ -220,12 +220,12 @@ class Product:
     def add_product(data):
         sql = '''
             INSERT INTO "Product" 
-            ("Product_id", "Supplier_id", "Stock_price", "Name", "Pstatus", "Description", "Category")
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ("Product_id", "Supplier_id", "Stock_price", "Name", "Description", "Category")
+            VALUES (%s, %s, %s, %s, %s, %s)
         '''
         DB.execute_input(sql, (
             data['Product_id'], data['Supplier_id'], data['Stock_price'],
-            data['Name'], data['Pstatus'], data['Description'], data['Category']
+            data['Name'], data['Description'], data['Category']
         ))
 
 
@@ -274,7 +274,7 @@ class Product:
             UPDATE "Product"
             SET "Stock_price" = %s, 
                 "Name" = %s, 
-                "Pstatus" = %s, 
+     
                 "Description" = %s,
                 "Supplier_id" = %s,
                 "Category" = %s
@@ -286,7 +286,7 @@ class Product:
         val = (
             input_data['Stock_price'],
             input_data['Name'],
-            input_data['Pstatus'],
+            
             input_data['Description'],
             input_data['Supplier_id'],
             input_data['Category'], # 新增 'Category'
