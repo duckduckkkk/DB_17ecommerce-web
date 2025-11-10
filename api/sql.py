@@ -90,6 +90,32 @@ class Supplier:
         sql = 'SELECT "Supplier_id" FROM "Supplier" WHERE "Supplier_id" = %s'
         return DB.fetchall(sql, (supplier_id,))
 
+    @staticmethod
+    def get_supplier_by_name(name):
+        """依廠商名稱查詢廠商資訊"""
+        sql = 'SELECT "Supplier_id", "Sname", "Contact_info" FROM "Supplier" WHERE "Sname" = %s'
+        return DB.fetchone(sql, (name,))
+
+    @staticmethod
+    def get_max_supplier_id():
+        """取得當前最大 Supplier_id"""
+        sql = 'SELECT MAX("Supplier_id") FROM "Supplier"'
+        result = DB.fetchone(sql)
+        if result and result[0] is not None:
+            return int(result[0])
+        else:
+            return 0
+
+    @staticmethod
+    def add_supplier(data):
+        """新增一筆廠商資料"""
+        sql = '''
+            INSERT INTO "Supplier" ("Supplier_id", "Sname", "Contact_info")
+            VALUES (%s, %s, %s)
+        '''
+        # 使用 execute_input 因為需要帶參數
+        DB.execute_input(sql, (data['Supplier_id'], data['Sname'], data['Contact_info']))
+
 class Member:
     @staticmethod
     def get_member(account):
@@ -164,6 +190,29 @@ class Cart:
 
 
 class Product:
+    @staticmethod
+    def get_max_product_id():
+        """取得 Product 表最大 Product_id"""
+        sql = 'SELECT MAX("Product_id") FROM "Product"'
+        result = DB.fetchone(sql)
+        if result and result[0] is not None:
+            return int(result[0])
+        else:
+            return 0
+
+    @staticmethod
+    def add_product(data):
+        sql = '''
+            INSERT INTO "Product" 
+            ("Product_id", "Supplier_id", "Stock_price", "Name", "Pstatus", "Description", "Category")
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        '''
+        DB.execute_input(sql, (
+            data['Product_id'], data['Supplier_id'], data['Stock_price'],
+            data['Name'], data['Pstatus'], data['Description'], data['Category']
+        ))
+
+
 
     @staticmethod
     def count():
@@ -190,20 +239,6 @@ class Product:
         sql = 'SELECT "Name" FROM "Product" WHERE "Product_id" = %s'
         result = DB.fetchone(sql, (product_id,))
         return result[0] if result else None
-
-    @staticmethod
-    def add_product(input_data):
-        sql = '''
-            INSERT INTO "Product" ("Product_id", "Stock_price", "Name", "Pstatus", "Description")
-            VALUES (%s, %s, %s, %s, %s)
-        '''
-        DB.execute_input(sql, (
-            input_data['Product_id'],
-            input_data['Stock_price'],
-            input_data['Name'],
-            input_data['Pstatus'],
-            input_data['Description']
-        ))
 
     @staticmethod
     def delete_product(product_id):

@@ -64,45 +64,60 @@ def book():
 @manager.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
-        data = ""
-        while(data != None):
-            number = str(random.randrange( 10000, 99999))
-            en = random.choice(string.ascii_letters)
-            pid = en + number
-            data = Product.get_product(pid)
-
         pname = request.values.get('pname')
         price = request.values.get('price')
         category = request.values.get('category')
         pdesc = request.values.get('description')
         pstatus = request.values.get('pstatus')
-        supplier_id = request.values.get('supplier_id')
+        supplier_name = request.values.get('supplier_name')
+        supplier_contact = request.values.get('supplier_contact')
+        print('supplier_name:', supplier_name, 'supplier_contact:', supplier_contact)
 
-        # 檢查是否正確獲取到所有欄位的數據
-        if pname is None or price is None or category is None or pdesc is None or pstatus is None or supplier_id is None:
+        # === 檢查必填欄位 ===
+        if not all([pname, price, category, pdesc, pstatus, supplier_name, supplier_contact]):
             flash('所有欄位都是必填的，請確認輸入內容。')
             return redirect(url_for('manager.productManager'))
 
-        # 檢查欄位的長度
-        if len(pname) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1:
-            flash('商品名稱、價格、商品狀態、供應商不可為空。')
-            return redirect(url_for('manager.productManager'))
+        # === 查詢是否有相同廠商 ===
+        existing_supplier = Supplier.get_supplier_by_name(supplier_name)
 
+        if existing_supplier:
+            existing_id = existing_supplier[0]
+            existing_name = existing_supplier[1]
+            existing_contact = existing_supplier[2]
 
-        if (len(pname) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1):
-            return redirect(url_for('manager.productManager'))
-        
-        Product.add_product(
-            {'Product_id' : pid,
-             'Name' : pname,
-             'Stock_price' : price,
-             'Category' : category,
-             'Description':pdesc,
-             'Pstatus': pstatus,
-             'Supplier_id': supplier_id
-            }
-        )
+            if existing_contact != supplier_contact:
+                flash('廠商名稱或聯絡資訊錯誤，請重新確認。')
+                return redirect(url_for('manager.productManager'))
 
+            supplier_id = existing_id  # 直接沿用原本 Supplier_id
+        else:
+            # 沒有找到 → 新增新廠商
+            max_id = Supplier.get_max_supplier_id()
+            supplier_id = max_id + 1 if max_id else 1
+
+            Supplier.add_supplier({
+                'Supplier_id': supplier_id,
+                'Sname': supplier_name,
+                'Contact_info': supplier_contact
+            })
+
+        # === 生成新的商品 ID ===
+        max_pid = Product.get_max_product_id()
+        pid = max_pid + 1 if max_pid else 1
+
+        # === 寫入 Product ===
+        Product.add_product({
+            'Product_id': pid,
+            'Supplier_id': supplier_id,
+            'Stock_price': price,
+            'Name': pname,
+            'Pstatus': pstatus,
+            'Description': pdesc,
+            'Category': category,
+        })
+
+        flash('商品新增成功！')
         return redirect(url_for('manager.productManager'))
 
     return render_template('productManager.html')
