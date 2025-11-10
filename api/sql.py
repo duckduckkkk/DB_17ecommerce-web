@@ -327,6 +327,7 @@ class Product:
 
  
 class Cart_Info:
+    
     @staticmethod
     def check_product(cart_id, product_id):
         """檢查購物車裡是否已經有這個商品"""

@@ -78,7 +78,8 @@ def bookstore():
         price = data[2]      
         category = data[5]     
         description = data[4] 
-        Sname=data[7]
+        Sname=data[6]
+        Contact_info=data[7]
         image = 'sdg.jpg'
         
         product = {
@@ -89,6 +90,7 @@ def bookstore():
             'Description': description,
             '商品圖片': image,
             'Sname':Sname,
+            'Contact_info':Contact_info,
             'Amount': 1
         }
 
@@ -224,8 +226,8 @@ def cart():
         # 更新數量
         elif "user_edit" in request.form:
             change_order()
-            flash("已更新購物車")
-            return redirect(url_for('bookstore.cart'))
+            
+            return redirect(url_for('bookstore.bookstore'))
 
         # 結帳
         elif "buy" in request.form:
@@ -247,6 +249,8 @@ def cart():
 
     # 如果有商品，顯示 cart.html
     return render_template('cart.html', data=product_data, user=current_user.name)
+
+
 
 @store.route('/order', methods=['GET', 'POST'])
 @login_required
