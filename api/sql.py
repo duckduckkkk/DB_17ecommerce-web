@@ -325,7 +325,7 @@ class Product:
         )
         DB.execute_input(sql, val)
 
-    
+ 
 class Cart_Info:
     @staticmethod
     def check_product(cart_id, product_id):
