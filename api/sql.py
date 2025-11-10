@@ -196,19 +196,19 @@ class Cart:
         """取得指定使用者的購物車"""
         sql = 'SELECT * FROM "Cart" WHERE "User_id" = %s'
         return DB.fetchone(sql, (user_id,))
-
     @staticmethod
     def add_cart(user_id):
-        # 先取得目前最大 Cart_id
-        max_id = DB.fetchone('SELECT MAX("Cart_id") FROM "Cart"')[0] or 0
-        next_cart_id = max_id + 1
+        """
+        為新使用者建立購物車，並且 Cart_id = user_id
+        """
+        cart_id = user_id  # 直接用 user_id 當 cart_id
 
         # 插入新購物車
         sql = 'INSERT INTO "Cart" ("Cart_id", "User_id") VALUES (%s, %s)'
-        DB.execute_input(sql, (next_cart_id, user_id))
+        DB.execute_input(sql, (cart_id, user_id))
 
-        # 回傳新 cart_id
-        return next_cart_id
+        # 回傳 cart_id
+        return cart_id
     @staticmethod
     def clear_cart(user_id):
         """清空購物車"""
