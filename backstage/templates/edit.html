@@ -27,27 +27,6 @@
         <td><input class="form-control" type="text" value="{{ data.單價 }}" name="price" required></td>
       </tr>
       <tr>
-        <th>類別</th>
-        <td>
-          <select class="form-control" name="Category">
-            {% if data.類別 == '上身' %}
-              <option value="其他">其他</option>
-              <option value="下身">下身</option>
-              <option value="上身" selected>上身</option>
-            {% elif data.類別 == '下身' %}
-              <option value="其他">其他</option>
-              <option value="下身" selected>下身</option>
-              <option value="上身">上身</option>
-            {% else %}
-              <option value="其他" selected>其他</option>
-              <option value="下身">下身</option>
-              <option value="上身">上身</option>
-            {% endif %}
-            
-          </select>
-        </td>
-      </tr>
-      <tr>
         <th>商品敘述</th>
         <td>
           <textarea class="form-control" name="description">{{ data.商品敘述 }}</textarea>
@@ -55,9 +34,14 @@
       </tr>
       
       <tr>
-        <th>供應商</th>
-        <td><input class="form-control" type="text" value="{{ data.供應商 }}" name="Supplier_id" required></td>
+        <th>供應商名稱</th>
+        <td><input class="form-control" type="text" value="{{ data.供應商名稱 }}" name="supplier_name" required></td>
       </tr>
+      <tr>
+        <th>供應商聯絡資訊</th>
+        <td><input class="form-control" type="text" value="{{ data.供應商聯絡資訊 }}" name="supplier_contact" required></td>
+      </tr>
+
       <!-- <tr>
         <th>商品圖片</th>
         <td>
