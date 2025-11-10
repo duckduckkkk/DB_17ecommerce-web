@@ -83,7 +83,28 @@ class DB:
             raise e
         finally:
             DB.release(connection)
+    @staticmethod
+    def execute_return(sql, input=None):
+        """
+        執行 INSERT/UPDATE/DELETE 並回傳 RETURNING 的結果
+        用法:
+            sql = 'INSERT INTO "Order" ("Total_amount","Green_delivery","Cart_id","User_id") VALUES (%s,%s,%s,%s) RETURNING "Order_id"'
+            order_id = DB.execute_return(sql, (total, green_delivery, cart_id, user_id))
+        """
+        connection = DB.connect()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(sql, input)
+                result = cursor.fetchone()  # 取第一列
+                connection.commit()
+                return result[0] if result else None
+        except psycopg2.Error as e:
+            print(f"Error executing return query: {e}")
+            raise e
+        finally:
+            DB.release(connection)
 
+    
 class Supplier:
     @staticmethod
     def get_supplier_name(supplier_id):
