@@ -69,35 +69,41 @@ def add():
             number = str(random.randrange( 10000, 99999))
             en = random.choice(string.ascii_letters)
             pid = en + number
-            data = Product.get_product(pid)
+            data = Product.get_product_by_pid(pid)
+            
+        name = request.values.get('Name')
+        price = request.values.get('Stock_price')
+        category = request.values.get('Category')       # 新增
+        description = request.values.get('Description')
+        pstatus = request.values.get('Pstatus')
+        supplier_id = request.values.get('Supplier_id')
 
-        pname = request.values.get('pname')
-        price = request.values.get('price')
-        category = request.values.get('category')
-        pdesc = request.values.get('description')
-        pstatus = request.values.get('pstatus')
-        supplier_id = request.values.get('supplier_id')
+        # pname = request.values.get('pname')
+        # price = request.values.get('price')
+        # category = request.values.get('category')
+        # pdesc = request.values.get('description')
+        # pstatus = request.values.get('pstatus')
+        # supplier_id = request.values.get('supplier_id')
 
         # 檢查是否正確獲取到所有欄位的數據
-        if pname is None or price is None or category is None or pdesc is None or pstatus is None or supplier_id is None:
+        if name is None or price is None or category is None or description is None or pstatus is None or supplier_id is None:
             flash('所有欄位都是必填的，請確認輸入內容。')
             return redirect(url_for('manager.productManager'))
 
         # 檢查欄位的長度
-        if len(pname) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1:
+        if len(name) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1:
             flash('商品名稱、價格、商品狀態、供應商不可為空。')
             return redirect(url_for('manager.productManager'))
 
-
-        if (len(pname) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1):
+        if (len(name) < 1 or len(price) < 1 or len(pstatus) < 1 or len(supplier_id) < 1):
             return redirect(url_for('manager.productManager'))
         
         Product.add_product(
             {'Product_id' : pid,
-             'Name' : pname,
+             'Name' : name,
              'Stock_price' : price,
              'Category' : category,
-             'Description':pdesc,
+             'Description':description,
              'Pstatus': pstatus,
              'Supplier_id': supplier_id
             }
@@ -120,10 +126,10 @@ def edit():
             {
             'Name' : request.values.get('pname'),
             'Stock_price' : request.values.get('price'),
-            'Category' : request.values.get('category'), 
+            'Category' : request.values.get('Category'), 
             'Description' : request.values.get('description'),
-            'Pstatus': request.values.get('pstatus'),
-            'Supplier_id': request.values.get('supplier_id'),
+            'Pstatus': request.values.get('Pstatus'),
+            'Supplier_id': request.values.get('Supplier_id'),
             'Product_id' : request.values.get('pid')
             }
         )
@@ -132,12 +138,17 @@ def edit():
 
     else:
         product = show_info()
+        if not product:
+            flash('找不到該商品')
+            return redirect(url_for('manager.productManager'))
         return render_template('edit.html', data=product)
 
 
 def show_info():
     pid = request.args['pid']
-    data = Product.get_product(pid)
+    data = Product.get_product_by_pid(pid)
+    if data is None:
+        return None
     pname = data[3]
     price = data[2]
     category = data[6]
