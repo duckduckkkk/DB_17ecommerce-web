@@ -77,8 +77,8 @@ def bookstore():
       
         pname = data[3]      
         price = data[2]      
-        category = data[4]     
-        description = data[5] 
+        category = data[5]     
+        description = data[4] 
         Sname=data[7]
         image = 'sdg.jpg'
         
@@ -197,7 +197,7 @@ def cart():
                 Cart.add_cart(current_user.id)
                 data = Cart.get_cart(current_user.id)
 
-            cart_id = data[1]  # (user_id, cart_id)
+            cart_id = data[0]  # (user_id, cart_id)
             product = Product.get_product(pid)
             if not product:
                 flash('Product not found.')
@@ -239,7 +239,7 @@ def cart():
         # 結帳
         elif "buy" in request.form:
             cart_data = Cart.get_cart(current_user.id)
-            cart_id = cart_data[1]
+            cart_id = cart_data[0]
             green_delivery = request.form.get('green_delivery', 'N')
             condition_dict = {pid.replace('condition_', ''): request.form[pid] 
                           for pid in request.form if pid.startswith('condition_')}
@@ -253,7 +253,7 @@ def cart():
     # 顯示購物車內容
     product_data = only_cart()
     if product_data == 0:
-        return render_template('empty.html', user=current_user.name)
+        return render_template('cart.html', data=product_data, user=current_user.name)
     else:
         return render_template('cart.html', data=product_data, user=current_user.name)
 
@@ -329,7 +329,7 @@ def confirm_order():
         flash("購物車為空，無法建立訂單")
         return redirect(url_for('bookstore.cart'))
 
-    cart_id = cart_data[1]
+    cart_id = cart_data[0]
     green_delivery = session.get('green_delivery', 'N')
 
     # 取得購物車商品
@@ -447,7 +447,7 @@ def only_cart():
     if not cart_data:
         return 0
 
-    cart_id = cart_data[1]  # (user_id, cart_id)
+    cart_id = cart_data[1]
     product_rows = Cart_Info.get_cart_products(cart_id)
 
     if not product_rows:
