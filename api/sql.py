@@ -311,6 +311,39 @@ class Cart_Info:
         '''
         return DB.fetchall(sql, (cart_id,))
 
+    @staticmethod
+    def update_product_info(cart_id, product_id, amount, green, condition, base_price):
+        """
+        更新購物車商品資訊
+        cart_id: 購物車編號
+        product_id: 商品編號
+        amount: 商品數量
+        green: 'Y' 或 'N'
+        condition: '全新' 或 '二手'
+        base_price: 商品原價
+        """
+        # 計算折扣後價格
+        price = base_price
+        if condition == '二手':
+            price = price * 0.6  # 打 0.6 折
+
+        # 加上運費
+        if green == 'Y':
+            shipping = 30
+        else:
+            shipping = 50
+
+        total_price = price + shipping
+
+        sql = '''UPDATE "Cart_Info"
+                 SET "Amount" = %s,
+                     "Green" = %s,
+                     "Condition" = %s,
+                     "Price" = %s
+                 WHERE "Cart_id" = %s AND "Product_id" = %s'''
+        DB.execute_input(sql, (amount, green, condition, total_price, cart_id, product_id))
+
+
 class Record:
     @staticmethod
     def get_total_money(tno):
