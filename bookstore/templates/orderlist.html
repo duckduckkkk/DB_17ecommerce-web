@@ -1,79 +1,185 @@
 {% extends "frontstage.html" %}
 {% block head %}
 {{ super() }}
+<style>
+  /* 整體背景與字體 */
+  body {
+    background-color: #f8fafc;
+    font-family: "Noto Sans TC", sans-serif;
+  }
+
+  /* 卡片樣式 */
+  .order-card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+
+  .order-header {
+    font-weight: 700;
+    color: #1f5281;
+    margin-bottom: 10px;
+  }
+
+  .order-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+  }
+
+  .order-info div {
+    margin: 4px 0;
+  }
+
+  /* 綠色運送標籤 */
+  .badge-green {
+    background: linear-gradient(90deg, #19a764, #3cd37a);
+    color: white;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 10px;
+  }
+
+  /* 按鈕樣式 */
+  .btn-detail {
+    background-color: white;
+    border: 2px solid #1f5281;
+    color: #1f5281;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-detail:hover {
+    background-color: #1f5281;
+    color: white;
+    transform: scale(1.05);
+  }
+
+  /* Modal 樣式 */
+  .modal-content {
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+  }
+
+  .modal-header {
+    background: linear-gradient(90deg, #1f5281, #19a764);
+    color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+
+  .modal-footer button {
+    border-radius: 10px;
+    border: 2px solid #19a764;
+    color: #19a764;
+    background-color: white;
+    transition: 0.3s;
+  }
+
+  .modal-footer button:hover {
+    background-color: #19a764;
+    color: white;
+  }
+
+  /* 表格內部 */
+  .table {
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table th {
+    background-color: #e9f5ef;
+    color: #1f5281;
+  }
+
+  .table td, .table th {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+</style>
 {% endblock head %}
 
 {% block title %}BookStore{% endblock title%}
 
 {% block content %}
-<!-- <form method="post" action="#"> -->
-  {% for i in data %}
-  <div class="modal fade" id="staticBackdrop{{i.訂單編號}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="staticBackdropLabel">訂單細項列表</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <div class="mb-3">
-                    <table class="table table-bordered">
-                      <tr>
-                        <th><center>商品名稱</center></th>
-                        <th><center>商品單價</center></th>
-                        <th><center>訂購數量</center></th>
-                      </tr>
-                      
-                      {% for j in detail %}
-                      {% if j.訂單編號 == i.訂單編號 %}
-                      <tr>
-                        <td> <center>{{ j.商品名稱 }}</center></td>
-                        <td> <center>{{ j.商品單價 }}</center></td>
-                        <td> <center>{{ j.訂購數量 }}</center></td>
-                      </tr>
-                      {% endif %}
-                      {% endfor %}
-                    </table>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal" style="width:30%;">回訂單</button>
-              </div>
-          </div>
+
+<!-- ====== Modal 區塊 ====== -->
+{% for i in data %}
+<div class="modal fade" id="staticBackdrop{{i.訂單編號}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">訂單細項 #{{ i.訂單編號 }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <table class="table table-bordered align-middle">
+          <thead>
+            <tr>
+              <th>商品名稱</th>
+              <th>商品單價</th>
+              <th>訂購數量</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for j in detail %}
+            {% if j.訂單編號 == i.訂單編號 %}
+            <tr>
+              <td>{{ j.商品名稱 }}</td>
+              <td>${{ j.商品單價 }}</td>
+              <td>{{ j.訂購數量 }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-bs-dismiss="modal">回訂單</button>
+      </div>
+    </div>
   </div>
-  {% endfor %}
-<!-- </form> -->
+</div>
+{% endfor %}
 
-
-
-<br/>
-<div class="container-xl">
-  <form method="post" action={{ url_for('bookstore.orderlist') }}>
-    <table class="table table-bordered">
-      <tr>
-        <th><center>訂單編號</center></th>
-        <th><center>訂單總價</center></th>
-        <th><center>訂單時間</center></th>
-        <th style="background-color: green;color:white; text-align: center;">綠色運送</th>
-        <th><center>查看訂單</center></th>
-      </tr>
-      {% for i in data %}
-      <tr>
-        <td> <center>{{ i.訂單編號 }}</center></td>
-        <td> <center>{{ i.訂單總價 }}</center></td>
-        <td> <center>{{ i.訂單時間 }}</center></td>
-        <td> <center>{{ i.綠色運送 }}</center></td>
-        <td width="20%">
-          <center>
-            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.訂單編號}}">
-              查看訂單細項
-            </button>
-          </center>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
+<!-- ====== 訂單條列卡片 ====== -->
+<div class="container-xl mt-4">
+  <form method="post" action="{{ url_for('bookstore.orderlist') }}">
+    {% for i in data %}
+    <div class="order-card">
+      <div class="order-header">訂單編號：{{ i.訂單編號 }}</div>
+      <div class="order-info">
+        <div>💰 訂單總價：<b>${{ i.訂單總價 }}</b></div>
+        <div>🕒 訂單時間：{{ i.訂單時間 }}</div>
+        <div>🚚 綠色運送：
+          {% if i.綠色運送 == 'Y' %}
+          <span class="badge-green">YES</span>
+          {% else %}
+          <span class="text-secondary">NO</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="text-end">
+        <button type="button" class="btn btn-detail" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.訂單編號}}">
+          查看訂單細項
+        </button>
+      </div>
+    </div>
+    {% endfor %}
   </form>
 </div>
 

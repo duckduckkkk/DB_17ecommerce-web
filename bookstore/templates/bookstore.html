@@ -1,105 +1,161 @@
 {% extends "frontstage.html" %}
+
 {% block head %}
 {{ super() }}
 {% endblock head %}
 
-{% block title %}商品列表{% endblock title%}
+{% block title %}商品列表{% endblock title %}
 
-{% block content%}
-<br/>
+{% block content %}
+<style>
+  /* 搜尋框樣式 */
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+  }
 
-{% with messages = get_flashed_messages() %}
-  {% for message in messages %}
-    {% if message == 'No permission' %}
-      <script language="javascript">
-        alert('您沒有管理員的權限喔！');
-      </script>
-    {% endif %}
-  {% endfor %}
-{% endwith %}
+  .search-wrapper .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #19a764;
+  }
 
+  .search-input {
+    width: 100%;
+    padding: 10px 40px;
+    border: 2px solid #0d8485;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
 
-<div class="book_table container-xxl">
+  .search-input:focus {
+    outline: none;
+    border-color: #19a764;
+    box-shadow: 0 0 8px rgba(25,167,100,0.5);
+  }
 
-  <form class="d-flex col-sm-4" action="{{ url_for('bookstore.bookstore', keyword=1) }}">
-    <div class="input-group">
-    <span class="input-group-text" id="basic-addon1">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+  /* 分類按鈕 */
+  .category-btns .btn {
+    margin-right: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* 商品卡片 */
+  .product-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+    height: 100%;
+  }
+
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+
+  .product-card .card-body {
+    padding: 1.3rem;
+  }
+
+  .product-title {
+    font-weight: 600;
+    color: #1f5281ff;
+  }
+
+  .product-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #19a764;
+  }
+
+  .btn-view,
+  .btn-cart {
+    background-color: white;
+    border: 2px solid #1f5281;
+    color: #1f5281;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-weight: 500;
+  }
+
+  .btn-view:hover,
+  .btn-cart:hover {
+    background-color: #1f5281;
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .product-row {
+    margin-bottom: 30px;
+  }
+</style>
+
+<!-- 搜尋框 -->
+<div class="d-flex justify-content-start container-xxl my-3">
+  <div class="search-wrapper">
+    <span class="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
       </svg>
     </span>
-    <input name='keyword' class="form-control me-2" type="search" placeholder="搜尋商品" aria-label="Search">
-    </div>
-  </form><br/>
-  <form method="post" action="{{ url_for('bookstore.cart') }}">
-      
-      
-      {% for product in product_data %}
-      {% if loop.index % 3 == 1 %}
-      <div class="row">
-      {% endif %}
-      
-        <div class="col-sm-4">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">{{product.Name}}</h5>  
-              <p class="card-text">${{product.Stock_price}}</p> 
-              
-              <a href="{{ url_for('bookstore.bookstore', pid=product.Product_id, sid=product.Supplier_id) }}" class="btn btn-outline-primary">查看商品資訊</a>
-              <button class="btn btn-outline-success" type="submit" value="{{ product.Product_id }}" name="pid">加入購物車</button> 
-            </div>
-          </div>
-        </div>
-
-        {% if loop.index % 3 == 0 %}
-        </div><br/>
-        {% endif %}
-            
-      {% endfor %}
-    </table>
-  </form>
-
-
-  <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-      {% if page == 1 %}
-      <li class="page-item disabled">
-        <a class="page-link" href="#" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      {% else %}
-      <li class="page-item">
-        <a class="page-link" href="{{ url_for('bookstore.bookstore', page=page-1) }}" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      {% endif %}
-      {% for i in range(1, count+1) %}
-      {% if single == 1 %}
-      <li class="page-item"><a class="page-link" href="{{ url_for('bookstore.bookstore', keyword=keyword, page=i) }}">{{i}}</a></li>
-      {% else %}
-      <li class="page-item"><a class="page-link" href="{{ url_for('bookstore.bookstore', page=i) }}">{{i}}</a></li>
-      {% endif %}
-      {% endfor %}
-      {% if flag == 1 %}
-      <li class="page-item disabled">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-      {% else %}
-      <li class="page-item">
-        <a class="page-link" href="{{ url_for('bookstore.bookstore', page=page+1) }}" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-      {% endif %}
-    </ul>
-  </nav>
-
-
-
+    <input type="text" class="form-control search-input" id="keyword" placeholder="搜尋商品" aria-label="Search">
+  </div>
 </div>
 
-{% endblock content%}
+<!-- 商品列表 -->
+<div class="container-xxl my-4">
+  <div class="row" id="productlist">
+    {% for product in product_data %}
+    <div class="col-md-4 product-row" data-category="{{ product.Pstatus }}">
+      <div class="card product-card h-100">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="product-title text-center">{{ product.Name }}</h5>
+            <p class="product-price text-center">${{ product.Stock_price }}</p>
+          </div>
+          <div class="d-flex justify-content-between mt-3">
+            <a href="{{ url_for('bookstore.bookstore', pid=product.Product_id, sid=product.Supplier_id) }}" class="btn btn-view w-50 me-2">查看商品</a>
+            <form method="post" action="{{ url_for('bookstore.cart') }}" class="w-50">
+              <button class="btn btn-cart w-100" type="submit" name="pid" value="{{ product.Product_id }}">加入購物車</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 分頁 -->
+<nav aria-label="Page navigation" class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page == 1 %}
+    <li class="page-item disabled">
+      <a class="page-link" href="#"><span aria-hidden="true">&laquo;</span></a>
+    </li>
+    {% else %}
+    <li class="page-item">
+      <a class="page-link" href="{{ url_for('bookstore.bookstore', page=page-1) }}"><span aria-hidden="true">&laquo;</span></a>
+    </li>
+    {% endif %}
+    {% for i in range(1, count+1) %}
+      {% if single == 1 %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('bookstore.bookstore', keyword=keyword, page=i) }}">{{ i }}</a></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('bookstore.bookstore', page=i) }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if flag == 1 %}
+    <li class="page-item disabled"><a class="page-link" href="#"><span aria-hidden="true">&raquo;</span></a></li>
+    {% else %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('bookstore.bookstore', page=page+1) }}"><span aria-hidden="true">&raquo;</span></a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock content %}

@@ -52,7 +52,6 @@ def bookstore():
                 'Supplier_id': i[1],
                 'Pstatus': i[4],
                 'Description': i[5]
-
             }
             book_data.append(book)
             total = total + 1
