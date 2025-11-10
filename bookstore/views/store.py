@@ -193,7 +193,7 @@ def cart():
                 Cart.add_cart(current_user.id)
                 data = Cart.get_cart(current_user.id)
 
-            cart_id = data[0]  # (user_id, cart_id)
+            cart_id = data[0]  # <-- 確認抓 cart_id
             product = Product.get_product(pid)
             if not product:
                 flash('Product not found.')
@@ -216,7 +216,7 @@ def cart():
             pid = request.form.get("delete")
             data = Cart.get_cart(current_user.id)
             if data:
-                cart_id = data[1]
+                cart_id = data[0]  # <-- 一樣抓正確 cart_id
                 sql = 'DELETE FROM "Cart_Info" WHERE "Cart_id" = %s AND "Product_id" = %s'
                 DB.execute_input(sql, (cart_id, pid))
                 flash("商品已刪除")
@@ -225,7 +225,7 @@ def cart():
         elif "user_edit" in request.form:
             change_order()
             flash("已更新購物車")
-            return redirect(url_for('bookstore.bookstore'))
+            return redirect(url_for('bookstore.cart'))
 
         # 結帳
         elif "buy" in request.form:
@@ -247,6 +247,7 @@ def cart():
 
     # 如果有商品，顯示 cart.html
     return render_template('cart.html', data=product_data, user=current_user.name)
+
 @store.route('/order', methods=['GET', 'POST'])
 @login_required
 def order():
@@ -434,10 +435,11 @@ def change_order():
 
 def only_cart():
     cart_data = Cart.get_cart(current_user.id)
+
     if not cart_data:
         return []
 
-    cart_id = cart_data[1]
+    cart_id = cart_data[0]  # <-- 確認抓到 cart_id
     product_rows = Cart_Info.get_cart_products(cart_id)
 
     if not product_rows:
@@ -445,11 +447,11 @@ def only_cart():
 
     product_data = []
     for row in product_rows:
+        # row 預期格式: (Product_id, Name, Stock_price, Amount)
         product_data.append({
             'Product_id': row[0],
             'Name': row[1],
             'Stock_price': row[2],
             'Amount': row[3]
         })
-
     return product_data
