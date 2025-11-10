@@ -39,8 +39,8 @@ def bookstore():
         search = request.values.get('keyword')
         keyword = search
         
-        cursor.execute('SELECT * FROM "Product" WHERE "Name" LIKE %s', ('%' + search + '%',))  
-        book_row = cursor.fetchall()
+        cursor.execute('SELECT * FROM "Product" WHERE "Name" LIKE %s', ('%' + search + '%',)) 
+        book_row = cursor.fetchall()  # <- 加上這行
         book_data = []
         final_data = []
         
