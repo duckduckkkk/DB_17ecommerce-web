@@ -171,21 +171,18 @@ def bookstore():
 
 # 會員購物車
 @store.route('/cart', methods=['GET', 'POST'])
-@login_required  # 使用者登入後才可以看
+@login_required
 def cart():
     # 防止管理者誤闖
-    if request.method == 'GET' and current_user.role == 'manager':
+    if current_user.role == 'manager':
         flash('No permission')
         return redirect(url_for('manager.home'))
 
-    # 加入購物車
+    # 處理 POST 請求
     if request.method == 'POST':
-        # 新增商品
+        # 新增商品到購物車
         if "pid" in request.form:
             pid = request.form.get("pid")
-        
-           
-
             if not pid:
                 flash('Product ID is missing.')
                 return redirect(url_for('bookstore.cart'))
@@ -202,22 +199,17 @@ def cart():
                 flash('Product not found.')
                 return redirect(url_for('bookstore.bookstore'))
 
-            supplier_id = product[1]      # 假設 Product(supplier_id, product_id, stock_price, name, ...)
-            price = product[2]            # 商品價格
+            supplier_id = product[1]
+            price = product[2]
 
-            # 檢查購物車裡是否已有該商品
             exist = Cart_Info.check_product(cart_id, pid)
             if exist is None:
-                # 沒有的話加入
                 Cart_Info.add_product(cart_id, current_user.id, supplier_id, pid, 1)
-                
             else:
-                # 有的話數量+1
-                new_amount = exist[4] + 1  # 假設 Amount 在第5欄
+                new_amount = exist[4] + 1
                 Cart_Info.update_amount(cart_id, pid, new_amount)
 
             flash("商品已加入購物車！")
-            
 
         # 刪除商品
         elif "delete" in request.form:
@@ -229,7 +221,7 @@ def cart():
                 DB.execute_input(sql, (cart_id, pid))
                 flash("商品已刪除")
 
-        # 更新數量（使用者手動修改）
+        # 更新數量
         elif "user_edit" in request.form:
             change_order()
             flash("已更新購物車")
@@ -241,25 +233,24 @@ def cart():
             cart_id = cart_data[0]
             green_delivery = request.form.get('green_delivery', 'N')
             condition_dict = {pid.replace('condition_', ''): request.form[pid] 
-                          for pid in request.form if pid.startswith('condition_')}
+                              for pid in request.form if pid.startswith('condition_')}
             session['green_delivery'] = green_delivery
             session['condition_dict'] = condition_dict
-
-            flash("")
-            
             return redirect(url_for('bookstore.order'))
 
     # 顯示購物車內容
     product_data = only_cart()
-    if product_data == 0:
-        return render_template('cart.html', data=product_data, user=current_user.name)
-    else:
-        return render_template('cart.html', data=product_data, user=current_user.name)
+    
+    # 空購物車直接導向 empty.html
+    if not product_data:
+        return render_template('empty.html', user=current_user.name)
 
+    # 如果有商品，顯示 cart.html
+    return render_template('cart.html', data=product_data, user=current_user.name)
 @store.route('/order', methods=['GET', 'POST'])
 @login_required
 def order():
-    print(request.method)
+
     data = Cart.get_cart(current_user.id)
     cart_id = data[1]
     product_rows = Cart_Info.get_cart_products(cart_id) 
@@ -306,7 +297,7 @@ def order():
         green_discount = 60 - 30  # 原本運費50，綠色運送30
         total += 30  # 實際運費30
     else:
-        total += 60  # 不選綠色運送，運費50
+        total += 60  # 不選綠色運送
 
     return render_template(
         'order.html',
@@ -444,13 +435,13 @@ def change_order():
 def only_cart():
     cart_data = Cart.get_cart(current_user.id)
     if not cart_data:
-        return 0
+        return []
 
     cart_id = cart_data[1]
     product_rows = Cart_Info.get_cart_products(cart_id)
 
     if not product_rows:
-        return 0
+        return []
 
     product_data = []
     for row in product_rows:

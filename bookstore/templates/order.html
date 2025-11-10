@@ -49,7 +49,9 @@
             <p>二手商品折價：{{ used_discount }} 元</p>
           {% endif %}
           {% if green_discount > 0 %}
-            <p>綠色運輸折價：{{ green_discount }} 元</p>
+            <p>綠色運輸：{{ 30 }} 元</p>
+          {% else %}
+            <p>運輸費用：{{ 60 }} 元</p>
           {% endif %}
           <p><b>最後付款金額：{{ total }} 元</b></p>
         </div>

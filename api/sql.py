@@ -218,6 +218,21 @@ class Cart:
 
 class Product:
     @staticmethod
+    def check_product_exists(name, supplier_id):
+        """
+        檢查同一個供應商下，是否已存在同名商品
+        返回 True/False
+        """
+        sql = '''
+            SELECT 1 
+            FROM "Product"
+            WHERE "Name" = %s AND "Supplier_id" = %s
+            LIMIT 1
+        '''
+        result = DB.fetchone(sql, (name, supplier_id))
+        return bool(result)
+    
+    @staticmethod
     def get_all_product_with_supplier():
         sql = '''
         SELECT 
@@ -310,7 +325,7 @@ class Product:
         )
         DB.execute_input(sql, val)
 
-    
+ 
 class Cart_Info:
     @staticmethod
     def check_product(cart_id, product_id):

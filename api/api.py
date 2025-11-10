@@ -47,6 +47,10 @@ def login():
             user.id = user_id
             login_user(user)
 
+            cart_data = Cart.get_cart(current_user.id)
+            if not cart_data:
+                Cart.add_cart(current_user.id)
+
             if( identity == 'user'):
                 return redirect(url_for('bookstore.bookstore'))
             else:
