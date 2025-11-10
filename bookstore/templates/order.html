@@ -15,17 +15,20 @@
         <th><center>商品名稱</center></th>
         <th><center>商品價格</center></th>
         <th><center>數量</center></th>
+        <th><center>商品狀態</center></th>
       </tr>
-      {% for book in data %}
+      {% for product in data %}
       <tr>
-        <td> <center>{{ book.商品編號 }}</center></td>
-        <td> <center>{{ book.商品名稱 }}</center></td>
-        <td> <center>{{ book.商品價格 }}</center></td>
+        <td> <center>{{ product.商品編號 }}</center></td>
+        <td> <center>{{ product.商品名稱 }}</center></td>
+        <td> <center>{{ product.商品價格 }}</center></td>
+        
         <td width="20%">
           <center>
-            {{ book.數量 }}
+            {{ product.數量 }}
           </center>
         </td>
+        <td> <center>{{ product.商品狀態 }}</center></td>
       </tr>
       {% endfor %}
     </table>
@@ -40,8 +43,15 @@
         <div class="col align-self-center">
 
         </div>
-        <div class="col align-self-end">
-          <b class="ml-50">訂單總價：{{ total }} 元</b>
+        <div class="mt-3">
+          <p><b>訂單總價：{{ ttotal }} 元</b></p>
+          {% if used_discount > 0 %}
+            <p>二手商品折價：{{ used_discount }} 元</p>
+          {% endif %}
+          {% if green_discount > 0 %}
+            <p>綠色運輸折價：{{ green_discount }} 元</p>
+          {% endif %}
+          <p><b>最後付款金額：{{ total }} 元</b></p>
         </div>
       </div>
     </div>

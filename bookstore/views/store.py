@@ -8,6 +8,7 @@ from datetime import datetime
 from numpy import identity, prod
 import random, string
 from sqlalchemy import null
+from flask import session
 from link import *
 import math
 from api.sql import DB
@@ -183,7 +184,7 @@ def cart():
         # 新增商品
         if "pid" in request.form:
             pid = request.form.get("pid")
-            print("接收到的 pid:", pid)
+        
            
 
             if not pid:
@@ -233,11 +234,20 @@ def cart():
         elif "user_edit" in request.form:
             change_order()
             flash("已更新購物車")
-            return redirect(url_for('store.cart'))
+            return redirect(url_for('bookstore.bookstore'))
 
         # 結帳
         elif "buy" in request.form:
-            flash("功能尚未實作：導向結帳頁")
+            cart_data = Cart.get_cart(current_user.id)
+            cart_id = cart_data[1]
+            green_delivery = request.form.get('green_delivery', 'N')
+            condition_dict = {pid.replace('condition_', ''): request.form[pid] 
+                          for pid in request.form if pid.startswith('condition_')}
+            session['green_delivery'] = green_delivery
+            session['condition_dict'] = condition_dict
+
+            flash("")
+            
             return redirect(url_for('bookstore.order'))
 
     # 顯示購物車內容
@@ -251,26 +261,61 @@ def cart():
 def order():
     data = Cart.get_cart(current_user.id)
     cart_id = data[1]
+    product_rows = Cart_Info.get_cart_products(cart_id) 
+    green_delivery = session.get('green_delivery', 'N')
+    condition_dict = session.get('condition_dict', {})
+
     
 
-    product_rows = Cart_Info.get_cart_products(cart_id)  
     product_data = []
+    total = 0        # 訂單總價
+    used_discount = 0  # 二手折扣金額
+    green_discount = 0 # 綠色運輸折扣金額
+    ttotal=0
 
-    total = 0
     for row in product_rows:
-        product = {
+        pid = str(row[0])
+        condition = condition_dict.get(pid, 'new')  # 預設為全新
+
+        price = float(row[2])
+        amount = int(row[3])
+        ttotal += price * amount
+
+
+        # 如果是二手商品，打0.6折
+        discounted_price = price * 0.6 if condition == 'used' else price
+        if condition == 'used':
+            used_discount += price * amount - discounted_price * amount
+
+        # 計算訂單總價
+        total += discounted_price * amount
+      
+
+        product_data.append({
             '商品編號': row[0],
             '商品名稱': row[1],
-            '商品價格': float(row[2]),
-            '數量': row[3]
-        }
-        total += float(row[2]) * int(row[3])
-        product_data.append(product)
-    
+            '商品價格': price,
+            '數量': amount,
+            '商品狀態': condition,
+            '綠色運送': green_delivery
+        })
 
+    # 計算綠色運輸運費折扣
+    if green_delivery == 'Y':
+        green_discount = 60 - 30  # 原本運費50，綠色運送30
+        total += 30  # 實際運費30
+    else:
+        total += 60  # 不選綠色運送，運費50
 
-    return render_template('order.html', data=product_data, total=total, user=current_user.name)
-
+    return render_template(
+        'order.html',
+        data=product_data,
+        total=total,
+        used_discount=used_discount,
+        green_discount=green_discount,
+        user=current_user.name,
+        ttotal=ttotal
+    )
 @store.route('/orderlist')
 def orderlist():
     if "OrderItem_id" in request.args :

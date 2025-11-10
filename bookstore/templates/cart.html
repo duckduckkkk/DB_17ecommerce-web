@@ -20,13 +20,14 @@
 <br/>
 <div class="container-xl">
   <br/>
-  <form method="post" action={{ url_for('bookstore.cart') }}>
+  <form method="post" action="{{ url_for('bookstore.cart') }}">
     <table class="table table-bordered">
       <tr>
         <th><center>商品編號</center></th>
         <th><center>商品名稱</center></th>
         <th><center>商品價格</center></th>
         <th><center>數量</center></th>
+        <th>商品狀態</th>
         <th><center>商品操作</center></th>
       </tr>
       {% for product in data %}
@@ -42,6 +43,12 @@
           </center>
         </td>
         <td>
+          <select name="condition_{{ product.Product_id }}">
+            <option value="new" selected>全新</option>
+            <option value="used">二手</option>
+          </select>
+        </td>
+        <td>
           <center>
             <button class="btn btn-danger" type="submit" value="{{product.Product_id}}" name="delete" onclick="return (confirm('你確定要刪除 \'{{product.Name }}\' 嗎？'))">
               刪除
@@ -51,6 +58,9 @@
       </tr>
       {% endfor %}
     </table>
+    <div>
+      <input type="checkbox" name="green_delivery" value="Y"> 綠色運送（選擇後運費 30，否則 50）
+    </div>
     <center>
       <div class="option">
         <button class="btn btn-primary" type="submit" value="edit" name="user_edit" >繼續購物</button>
