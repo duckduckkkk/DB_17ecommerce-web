@@ -237,12 +237,10 @@ class Product:
 
     @staticmethod
     def get_product(product_id):
-        sql = '''
-        SELECT p.*, s."Sname"
+        sql='''SELECT p.*, s."Sname", s."Contact_info"
         FROM "Product" p
         JOIN "Supplier" s ON p."Supplier_id" = s."Supplier_id"
-        WHERE p."Product_id" = %s
-    '''
+        WHERE p."Product_id" = %s'''
         return DB.fetchone(sql, (product_id,))
     
     @staticmethod
@@ -272,27 +270,19 @@ class Product:
     def update_product(input_data):
         sql = '''
             UPDATE "Product"
-            SET "Stock_price" = %s, 
-                "Name" = %s, 
-     
-                "Description" = %s,
-                "Supplier_id" = %s,
-                "Category" = %s
+            SET "Stock_price" = %s,
+                "Name" = %s,
+                "Description" = %s
             WHERE "Product_id" = %s
         '''
-        
-        # 2. 傳入的 tuple 資料也加入 "Category"
-        # (鍵名 'Category' 必須和 manager.py 傳來的一致)
         val = (
             input_data['Stock_price'],
             input_data['Name'],
-            
             input_data['Description'],
-            input_data['Supplier_id'],
-            input_data['Category'], # 新增 'Category'
-            input_data['Product_id'] # Product_id 放在最後對應 WHERE
+            input_data['Product_id']
         )
         DB.execute_input(sql, val)
+
     
 class Cart_Info:
     @staticmethod

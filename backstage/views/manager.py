@@ -69,10 +69,8 @@ def add():
         price = request.values.get('price')
         category = request.values.get('category')
         pdesc = request.values.get('description')
-        # pstatus = request.values.get('pstatus')
         supplier_name = request.values.get('supplier_name')
         supplier_contact = request.values.get('supplier_contact')
-        print('supplier_name:', supplier_name, 'supplier_contact:', supplier_contact)
 
         # === 檢查必填欄位 ===
         if not all([pname, price, category, pdesc, supplier_name, supplier_contact]):
@@ -113,7 +111,6 @@ def add():
             'Supplier_id': supplier_id,
             'Stock_price': price,
             'Name': pname,
-            # 'Pstatus': pstatus,
             'Description': pdesc,
             'Category': category,
         })
@@ -126,55 +123,67 @@ def add():
 @manager.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
-    if request.method == 'GET':
-        if(current_user.role == 'user'):
-            flash('No permission')
-            return redirect(url_for('bookstore'))
+    if current_user.role == 'user':
+        flash('No permission')
+        return redirect(url_for('bookstore'))
 
     if request.method == 'POST':
-        Product.update_product(
-            {
-            'Name' : request.values.get('pname'),
-            'Stock_price' : request.values.get('price'),
-            'Category' : request.values.get('Category'), 
-            'Description' : request.values.get('description'),
-            # 'Pstatus': request.values.get('Pstatus'),
-            'Supplier_id': request.values.get('Supplier_id'),
-            'Product_id' : request.values.get('pid')
-            }
-        )
-        
+        pid = request.values.get('pid')
+        Product.update_product({
+            'Name': request.values.get('pname'),
+            'Stock_price': request.values.get('price'),
+            'Category': request.values.get('Category'),
+            'Description': request.values.get('description'),
+            'Product_id': pid
+            # 不要改 Supplier_id
+        })
+
+        # 更新 Supplier 資訊
+        product = Product.get_product_by_pid(pid)
+        supplier_id = product[1]  # Product 表的 Supplier_id
+
+        supplier_name = request.values.get('supplier_name')
+        supplier_contact = request.values.get('supplier_contact')
+
+        sql = '''
+            UPDATE "Supplier"
+            SET "Sname" = %s,
+                "Contact_info" = %s
+            WHERE "Supplier_id" = %s
+        '''
+        DB.execute_input(sql, (supplier_name, supplier_contact, supplier_id))
+
+        flash('商品及供應商資訊更新成功！')
         return redirect(url_for('manager.productManager'))
 
-    else:
-        product = show_info()
-        if not product:
-            flash('找不到該商品')
-            return redirect(url_for('manager.productManager'))
-        return render_template('edit.html', data=product)
+
+    # GET 方法：顯示商品資訊
+    product = show_info()
+    if not product:
+        flash('找不到該商品')
+        return redirect(url_for('manager.productManager'))
+
+    return render_template('edit.html', data=product)
 
 
 def show_info():
-    pid = request.args['pid']
-    data = Product.get_product_by_pid(pid)
-    if data is None:
+    pid = request.args.get('pid')
+    data = Product.get_product(pid)
+    if not data:
         return None
-    pname = data[3]
-    price = data[2]
-    category = data[6]
-    description = data[5]
-    # status = data[4]
-    supplier = data[1]
-
     product = {
-        '商品編號': pid,
-        '商品名稱': pname,
-        '單價': price,
-        '類別': category,
-        '商品敘述': description,
-        '供應商': supplier
+        '商品編號': data[0],
+        '供應商編號': data[1],
+        '單價': data[2],
+        '商品名稱': data[3],
+        '商品敘述': data[4],
+        '類別': data[5],
+        '供應商名稱': data[6],
+        '供應商聯絡資訊': data[7]
     }
     return product
+
+
 
 
 @manager.route('/orderManager', methods=['GET', 'POST'])
