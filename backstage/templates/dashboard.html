@@ -112,7 +112,7 @@
 var pieData = datab.filter(item => item.value > 0);
 var zeroData = datab.filter(item => item.value === 0);
 
-// 自動給 0 值供應商分配顏色（可以用任何你喜歡的顏色列表）
+// 自動給 0 值供應商分配顏色
 var zeroColorList = ['#FF7F50','#87CEFA','#DA70D6','#32CD32','#6495ED','#FF69B4','#BA55D3','#CD5C5C'];
 zeroData = zeroData.map((item, index) => ({
     name: item.name,
@@ -137,18 +137,24 @@ var optionb = {
     legend: {
         orient: 'vertical',
         left: 'left',
-        data: datab.map(item => item.name) // 顯示所有供應商
+        top: '10%',
+        itemWidth: 12,
+        itemHeight: 12,
+        formatter: function(name) {
+            return name.length > 10 ? name.slice(0,10) + '...' : name;
+        }
     },
     series: [
         {
             name: '銷量',
             type: 'pie',
-            radius: ['40%', '70%'],
+            radius: ['40%', '60%'],  // 主圓餅半徑稍微縮小避免與內圈重疊
             center: ['50%', '55%'],
             data: pieData,
             label: {
                 show: true,
-                formatter: '{b}: {c} ({d}%)'
+                position: 'inside', // 改成內部標籤
+                formatter: '{b}: {c}'
             },
             emphasis: {
                 itemStyle: {
@@ -161,9 +167,9 @@ var optionb = {
         {
             name: '銷售額為0的供應商',
             type: 'pie',
-            radius: ['12%', '18%'],  // 外圈圓餅
+            radius: ['20%', '30%'],  // 內圈半徑
             center: ['50%', '55%'],
-            data: zeroData, // 自動分配顏色的 0 值供應商
+            data: zeroData,
             label: {
                 show: true,
                 position: 'outside',
@@ -178,6 +184,7 @@ var optionb = {
 };
 
 myChartb.setOption(optionb);
+
 
 
 
