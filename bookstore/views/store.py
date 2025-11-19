@@ -231,6 +231,7 @@ def cart():
 
         # 結帳
         elif "buy" in request.form:
+            change_order()
             cart_data = Cart.get_cart(current_user.id)
             cart_id = cart_data[0]
             green_delivery = request.form.get('green_delivery', 'N')
