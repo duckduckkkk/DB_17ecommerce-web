@@ -520,3 +520,41 @@ class Analysis:
             ORDER BY order_count DESC
         '''
         return DB.fetchall(sql, ('user',))
+    
+    @staticmethod
+    def monthly_green_and_secondhand():
+        """
+        回傳每月綠色運送訂單數量與二手商品數量
+        return: list of dict
+        [
+            {"month": 1, "green_count": 10, "secondhand_count": 5},
+            ...
+        ]
+        """
+        sql = '''
+        WITH monthly_orders AS (
+            SELECT 
+                EXTRACT(MONTH FROM "Order_date") AS month,
+                COUNT(*) FILTER (WHERE "Green_delivery" = 'Y') AS green_count
+            FROM "Order"
+            GROUP BY EXTRACT(MONTH FROM "Order_date")
+        ),
+        monthly_secondhand AS (
+            SELECT 
+                EXTRACT(MONTH FROM O."Order_date") AS month,
+                COUNT(*) AS secondhand_count
+            FROM "Order_Item" oi
+            JOIN "Order" O ON oi."Order_id" = O."Order_id"
+            WHERE oi."Condition" = 'used'
+            GROUP BY EXTRACT(MONTH FROM O."Order_date")
+        )
+        SELECT 
+            m.month,
+            COALESCE(g.green_count,0) AS green_count,
+            COALESCE(s.secondhand_count,0) AS secondhand_count
+        FROM generate_series(1,12) AS m(month)
+        LEFT JOIN monthly_orders g ON g.month = m.month
+        LEFT JOIN monthly_secondhand s ON s.month = m.month
+        ORDER BY m.month
+        '''
+        return DB.fetchall(sql)

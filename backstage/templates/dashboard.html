@@ -2,11 +2,11 @@
 {% block head %}
 {{ super() }}
 {% endblock head %}
-{% block title %}後台資料分析{% endblock title%}
+{% block title %}後台資料分析{% endblock title %}
 {% block content %}
 <style>
 #dashboard .nav-link {
-    color: white; /* 文字白色 */
+    color: white; 
     background-color: rgba(16, 42, 77, 0.8); 
     border: none;
     margin-right: 5px;
@@ -16,13 +16,13 @@
 
 #dashboard .nav-link:hover {
     background-color: rgba(25, 167, 100, 0.8); 
-    transform: scale(1.05); /* 放大 5% */
+    transform: scale(1.05); 
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
 }
 
 #dashboard .nav-link.active {
     background-color: rgba(8, 114, 82, 0.8); 
-    font-weight: 600; /* 加粗 */
+    font-weight: 600; 
     transform: scale(1); 
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); 
 }
@@ -32,13 +32,13 @@
 }
 </style>
 <div class="my-3 p-3 bg-body rounded shadow-sm">
-  <!-- Dashboard -->
   <div id="dashboard">
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">年/月銷售額分析</button>
         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">供應商銷售分析</button>
         <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">客戶消費排名</button>        
+        <button class="nav-link" id="nav-green-tab" data-bs-toggle="tab" data-bs-target="#nav-green" type="button" role="tab" aria-controls="nav-green" aria-selected="false">綠色運送 & 二手商品分析</button>
       </div>      
     </nav>
   </div>
@@ -59,183 +59,89 @@
         <div id="mainc" class="container-fluid" style="width: 1200px;height:500px"></div>
       </center>
     </div>
+    <div class="tab-pane fade" id="nav-green" role="tabpanel" aria-labelledby="nav-green-tab">
+      <center>
+        <div id="maing" class="container-fluid" style="width: 1200px;height:500px"></div>
+      </center>
+    </div>
   </div>
 </div>
 
 <script>
-  // 以長條圖與折線圖分析各月訂單
+  // 各月總銷售額 & 訂單數量
   var chartDoma = document.getElementById('maina');
   var myCharta = echarts.init(chartDoma);
   var data = {{revenue|tojson}};
   var count = {{dataa|tojson}};
   var optiona = {
-    title: {
-      text: '各月總銷售額'
-    },
+    title: { text: '各月總銷售額' },
     tooltip: {},
-    legend: {
-      data: ['訂單數量']
-    },
-    xAxis: {
-      data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-    },
+    xAxis: { data: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'] },
     yAxis: {},
     series: [{
       name: '總銷售額/NTD',
       type: 'bar',
-      // symbol: 'circle',
-      symbolSize: 16,
       data: data,
       markPoint: {
-        data: [
-          {type: 'max', name: '銷量額最高月份'},
-          {type: 'min', name: '銷量額最低月份'}
-        ]
+        data: [{type: 'max', name: '銷量額最高月份'}, {type: 'min', name: '銷量額最低月份'}]
       },
-      label: {
-        show: true,
-        position: 'top',
-        textStyle: {
-          fontSize: 15
-        }
-      }
-    }
-    ],
-    legend: {
-      show: true
-    },
+      label: { show: true, position: 'top', textStyle: { fontSize: 15 } }
+    }]
   };
+  myCharta.setOption(optiona);
 
+  // 各供應商銷售分析
   var datab = {{ datab|tojson | safe if datab else '[]' }};
+  var pieData = datab.filter(item => item.value > 0);
+  var zeroData = datab.filter(item => item.value === 0);
+  var zeroColorList = ['#FF7F50','#87CEFA','#DA70D6','#32CD32','#6495ED','#FF69B4','#BA55D3','#CD5C5C'];
+  zeroData = zeroData.map((item,index)=>({name:item.name,value:item.value,itemStyle:{color:zeroColorList[index % zeroColorList.length]}}));
 
-// 分離有銷售額和銷售額為0的供應商
-var pieData = datab.filter(item => item.value > 0);
-var zeroData = datab.filter(item => item.value === 0);
-
-// 自動給 0 值供應商分配顏色
-var zeroColorList = ['#FF7F50','#87CEFA','#DA70D6','#32CD32','#6495ED','#FF69B4','#BA55D3','#CD5C5C'];
-zeroData = zeroData.map((item, index) => ({
-    name: item.name,
-    value: item.value,
-    itemStyle: { color: zeroColorList[index % zeroColorList.length] }
-}));
-
-var chartDomb = document.getElementById('mainb');
-var myChartb = echarts.init(chartDomb);
-
-var optionb = {
-    color: ['#5470C6', '#91CC75', '#EE6666', '#FAC858', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'], // 主圓餅顏色
-    title: {
-        text: '各供應商總銷貨額',
-        left: 'center',
-        top: '5%'
-    },
-    tooltip: {
-        trigger: 'item',
-        formatter: '{b} : {c} ({d}%)'
-    },
-    legend: {
-        orient: 'vertical',
-        left: 'left',
-        top: '10%',
-        itemWidth: 12,
-        itemHeight: 12,
-        formatter: function(name) {
-            return name.length > 10 ? name.slice(0,10) + '...' : name;
-        }
-    },
-    series: [
-        {
-            name: '銷量',
-            type: 'pie',
-            radius: ['40%', '60%'],  // 主圓餅半徑稍微縮小避免與內圈重疊
-            center: ['50%', '55%'],
-            data: pieData,
-            label: {
-                show: true,
-                position: 'inside', // 改成內部標籤
-                formatter: '{b}: {c}'
-            },
-            emphasis: {
-                itemStyle: {
-                    shadowBlur: 15,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            }
-        },
-        {
-            name: '銷售額為0的供應商',
-            type: 'pie',
-            radius: ['20%', '30%'],  // 內圈半徑
-            center: ['50%', '55%'],
-            data: zeroData,
-            label: {
-                show: true,
-                position: 'outside',
-                formatter: '{b}: {c}',
-                color: '#555555'
-            },
-            labelLine: {
-                show: true
-            }
-        }
+  var chartDomb = document.getElementById('mainb');
+  var myChartb = echarts.init(chartDomb);
+  var optionb = {
+    title:{text:'各供應商總銷貨額',left:'center',top:'5%'},
+    tooltip:{trigger:'item',formatter:'{b} : {c} ({d}%)'},
+    legend:{orient:'vertical',left:'left',top:'10%',itemWidth:12,itemHeight:12,formatter:function(name){return name.length>10?name.slice(0,10)+'...':name;}},
+    series:[
+      {name:'銷量',type:'pie',radius:['40%','60%'],center:['50%','55%'],data:pieData,label:{show:true,position:'inside',formatter:'{b}: {c}'},emphasis:{itemStyle:{shadowBlur:15,shadowOffsetX:0,shadowColor:'rgba(0,0,0,0.5)'}}},
+      {name:'銷售額為0的供應商',type:'pie',radius:['20%','30%'],center:['50%','55%'],data:zeroData,label:{show:true,position:'outside',formatter:'{b}: {c}',color:'#555555'},labelLine:{show:true}}
     ]
-};
+  };
+  myChartb.setOption(optionb);
 
-myChartb.setOption(optionb);
-
-
-
-
-  // 使用動態長條圖查看消費總額最多的使用者
+  // 客戶消費總額
   var chartDomc = document.getElementById('mainc');
   var myChartc = echarts.init(chartDomc);
-
-  var data = {{datac|tojson}};      // 消費總額
-  var nameList = {{nameList|tojson}}; // 使用者名稱
-
+  var data = {{datac|tojson}};
+  var nameList = {{nameList|tojson}};
   var optionc = {
-      title: {
-          text: '單一顧客消費總額',
-          left: 'center'
-      },
-      tooltip: {
-          trigger: 'axis',
-          axisPointer: { type: 'shadow' }
-      },
-      xAxis: {
-          type: 'value',
-          name: '消費總額'
-      },
-      yAxis: {
-          type: 'category',
-          data: nameList,
-          inverse: true
-      },
-      series: [{
-          name: '消費總額/NTD',
-          type: 'bar',
-          data: data,
-          barWidth: 30,
-          label: {
-              show: true,
-              position: 'right'
-          },
-          itemStyle: {
-              color: '#06d2daff'
-          }
-      }]
+    title:{text:'單一顧客消費總額',left:'center'},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+    xAxis:{type:'value',name:'消費總額'},
+    yAxis:{type:'category',data:nameList,inverse:true},
+    series:[{name:'消費總額/NTD',type:'bar',data:data,barWidth:30,label:{show:true,position:'right'},itemStyle:{color:'#06d2daff'}}]
   };
-
   myChartc.setOption(optionc);
 
+  // 第四個按鈕：綠色運送 & 二手商品分析
+  var chartDomg = document.getElementById('maing');
+  var myChartg = echarts.init(chartDomg);
+  var greenCounts = {{green_counts|tojson}};       // Green_delivery='Y'
+  var secondhandCounts = {{secondhand_counts|tojson}}; // Pstatus='二手'
 
+  var optiong = {
+    title:{text:'每月綠色運送與二手商品數量',left:'center'},
+    tooltip:{trigger:'axis'},
+    legend:{data:['綠色運送訂單數','二手商品數量'],top:'10%'},
+    xAxis:{type:'category',data:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']},
+    yAxis:{type:'value'},
+    series:[
+      {name:'綠色運送訂單數',type:'bar',data:greenCounts},
+      {name:'二手商品數量',type:'bar',data:secondhandCounts}
+    ]
+  };
+  myChartg.setOption(optiong);
 
-  optiona && myCharta.setOption(optiona);
-  optionb && myChartb.setOption(optionb);
-  optionc && myChartc.setOption(optionc);
-      
 </script>
-
 {% endblock content %}
